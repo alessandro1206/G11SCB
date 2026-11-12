@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>G11-SCB // BLAST DOOR CONTROL TERMINAL MK-IV</title>
+  <title>G11-SCB // BUNKER CONTROL TERMINAL MK-IV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -25,14 +25,14 @@
         <div class="green-emblem-inner">UNLOCKED</div>
       </div>
 
-      <div class="green-status-pill">AUTHORIZATION VERIFIED // AIRLOCK ALPHA OVERRIDE</div>
+      <div class="green-status-pill" id="greenStatusPill">AUTHORIZATION VERIFIED // OVERRIDE COMPLETE</div>
       <h1 class="green-giant-title" id="greenVictoryTitle">ACCESS GRANTED</h1>
       <p class="green-subtitle" id="greenVictorySubtitle">
         BLAST DOOR UNSEALED — PROCEED TO NEXT CHALLENGE STATION
       </p>
 
       <div class="green-sequence-verified" id="greenVerifiedRow">
-        <!-- Populated dynamically with the 6 verified symbols & digits -->
+        <!-- Populated dynamically with the verified symbols & digits -->
       </div>
 
       <div class="green-telemetry-strip">
@@ -44,7 +44,7 @@
       </div>
 
       <button class="green-reset-btn" id="greenResetBtn" type="button">
-        🔑 RE-LOCK AIRLOCK &amp; RESET FOR NEXT TEAM (ESC)
+        🔑 RE-LOCK TERMINAL &amp; RESET FOR NEXT TEAM (ESC)
       </button>
     </div>
 
@@ -52,7 +52,7 @@
   </section>
 
   <!-- ======================================================================= -->
-  <!-- MAIN INDUSTRIAL HARDWARE CHASSIS                                        -->
+  <!-- MAIN INDUSTRIAL HARDWARE CHASSIS (SINGLE ASSIGNED DEVICE CHALLENGE)     -->
   <!-- ======================================================================= -->
   <div class="bunker-chassis" id="mainChassis">
     <!-- 4 Machined Corner Hex Bolts -->
@@ -69,8 +69,8 @@
       <div class="nameplate">
         <div class="rivet r-left"></div>
         <div class="nameplate-content">
-          <span class="serial-code">UNIT: G11-SCB // SEC-01 // MK-IV</span>
-          <h1 class="hardware-title" id="stationHeaderTitle">BUNKER BLAST DOOR CONTROL PANEL</h1>
+          <span class="serial-code" id="stationSerialText">UNIT: G11-SCB // SEC-01 // MK-IV</span>
+          <h1 class="hardware-title" id="stationHeaderTitle">STATION 01: AIRLOCK ALPHA BLAST DOOR</h1>
         </div>
         <div class="rivet r-right"></div>
       </div>
@@ -87,8 +87,8 @@
         <div class="telemetry-item">
           <span class="led-lamp led-amber"></span>
           <div class="tel-text">
-            <span class="tel-label">CONTAINMENT</span>
-            <span class="tel-val">LEVEL 4</span>
+            <span class="tel-label">ACTIVE DEVICE</span>
+            <span class="tel-val" id="activeDeviceBadge">STATION 01</span>
           </div>
         </div>
         <div class="telemetry-item">
@@ -110,7 +110,7 @@
           <span class="rocker-led"></span>
           <span class="rocker-label">FULLSCREEN</span>
         </button>
-        <button class="rocker-btn backend-btn" id="openBackendBtn" type="button" title="Open Backend Materials, Clues & Settings">
+        <button class="rocker-btn backend-btn" id="openBackendBtn" type="button" title="Open Backend Materials, Clues & Device Station Selector">
           <span class="rocker-led backend-led"></span>
           <span class="rocker-label">⚙️ BACKEND</span>
         </button>
@@ -125,12 +125,12 @@
         <!-- Recessed Green/Amber Phosphor CRT Display -->
         <div class="crt-bezel">
           <div class="bezel-screws">
-            <span></span><span>CRT-DSP // 09-A</span><span></span>
+            <span></span><span id="crtBezelCode">CRT-DSP // ST-01</span><span></span>
           </div>
           <div class="crt-glass" id="crtScreen">
             <div class="crt-glare"></div>
             <div class="crt-header-row">
-              <span>SYS.DIAGNOSTIC // G11-SCB</span>
+              <span id="crtHeaderLabel">SYS.DIAGNOSTIC // G11-SCB // ST-01</span>
               <span class="blink-cursor">● LIVE</span>
             </div>
 
@@ -143,10 +143,7 @@
             </div>
 
             <div class="crt-terminal-log" id="crtLog">
-              <p class="log-line"><span class="log-prefix">[SYS]</span> AIRLOCK BLAST DOOR SEALED.</p>
-              <p class="log-line"><span class="log-prefix">[DIR]</span> FIND THE <strong>6 EQUATIONS</strong> SCATTERED IN THE ROOM.</p>
-              <p class="log-line"><span class="log-prefix">[DIR]</span> SOLVE THE VALUE OF EACH HAZARD SYMBOL.</p>
-              <p class="log-line highlight"><span class="log-prefix">[REQ]</span> INPUT THE 6-SYMBOL SEQUENCE TO UNLOCK DOOR.</p>
+              <!-- Populated dynamically per station -->
             </div>
           </div>
         </div>
@@ -224,92 +221,22 @@
       <section class="bay-right">
         <div class="hardware-module lock-module" id="lockModule">
           <div class="module-title-bar">
-            <span class="module-code">MOD-01 // BLAST DOOR SEQUENCE MATRIX</span>
+            <span class="module-code" id="lockModuleCode">MOD-01 // BLAST DOOR SEQUENCE MATRIX</span>
             <span class="security-chip locked" id="securityChip">🔒 SECURITY LOCK ACTIVE</span>
           </div>
 
-          <!-- Target Symbol Sequence Array -->
+          <!-- Target Sequence / Code Array -->
           <div class="sequence-housing">
-            <div class="housing-label">REQUIRED DOOR UNLOCK SEQUENCE (6 DIGITS)</div>
+            <div class="housing-label" id="sequenceHousingLabel">REQUIRED DOOR UNLOCK SEQUENCE</div>
 
             <div class="sequence-cells-grid" id="sequenceGrid">
-              <!-- Slot 1 -->
-              <div class="seq-cell active" data-slot="0">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-01</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-0">☢️</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-0">-</div>
-              </div>
-
-              <!-- Slot 2 -->
-              <div class="seq-cell" data-slot="1">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-02</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-1">⚙️</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-1">-</div>
-              </div>
-
-              <!-- Slot 3 -->
-              <div class="seq-cell" data-slot="2">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-03</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-2">🔺</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-2">-</div>
-              </div>
-
-              <!-- Slot 4 -->
-              <div class="seq-cell" data-slot="3">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-04</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-3">☣️</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-3">-</div>
-              </div>
-
-              <!-- Slot 5 -->
-              <div class="seq-cell" data-slot="4">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-05</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-4">❄️</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-4">-</div>
-              </div>
-
-              <!-- Slot 6 -->
-              <div class="seq-cell" data-slot="5">
-                <div class="cell-header">
-                  <span class="cell-pos">CH-06</span>
-                  <span class="cell-led"></span>
-                </div>
-                <div class="cell-symbol-window">
-                  <span class="hazard-glyph" id="slot-glyph-5">☢️</span>
-                </div>
-                <div class="cell-seven-seg" id="digit-slot-5">-</div>
-              </div>
+              <!-- Populated dynamically with the station's slots (e.g., 6 symbol cells for Station 1, or N cells for Stations 2-5) -->
             </div>
           </div>
 
           <!-- Vacuum Fluorescent Status Readout Strip -->
           <div class="vfd-display-well">
-            <div class="vfd-text" id="vfdReadout">AWAITING 6-DIGIT SYMBOL OVERRIDE SEQUENCE...</div>
+            <div class="vfd-text" id="vfdReadout">AWAITING OVERRIDE SEQUENCE...</div>
           </div>
 
           <!-- Tactile Mechanical Keypad & Guarded Override Switch -->
@@ -380,23 +307,38 @@
 
     <!-- Bottom Chassis Footer & Hazard Strip -->
     <footer class="hardware-footer">
-      <span>G11-SCB CONTAINMENT DIVISION // TERMINAL ID: #AX-01</span>
+      <span id="footerStationId">G11-SCB CONTAINMENT DIVISION // STATION 01 TERMINAL</span>
       <span>KEYBOARD INPUT ACTIVE [0-9, BACKSPACE, ENTER, ESC]</span>
     </footer>
     <div class="hazard-strip"></div>
   </div>
 
   <!-- ======================================================================= -->
-  <!-- BACKEND CONTROL CENTER (CLUES, REQUIRED MATERIALS, & SETTINGS)          -->
+  <!-- BACKEND CONTROL CENTER (DEVICE CHALLENGE SELECTOR, CLUES, MATERIALS)    -->
   <!-- ======================================================================= -->
   <div class="backend-modal-backdrop hidden" id="backendModal">
     <div class="backend-modal-window">
       <div class="backend-modal-header">
         <div>
-          <span class="backend-tag">G11-SCB // SERVER BACKEND PORTAL</span>
-          <h2>OPERATOR MATERIALS, CLUES &amp; SYSTEM SETTINGS</h2>
+          <span class="backend-tag">G11-SCB // MULTI-DEVICE BACKEND PORTAL</span>
+          <h2>DEVICE CHALLENGE ASSIGNER, CLUES, MATERIALS &amp; SETTINGS</h2>
         </div>
         <button class="backend-close-btn" id="closeBackendBtn" type="button">✕ CLOSE</button>
+      </div>
+
+      <!-- DEVICE CHALLENGE SELECTOR BAR (Assign which of the 5 challenges this device displays) -->
+      <div class="device-assign-bar">
+        <div class="assign-label">
+          <strong>🖥️ ASSIGN THIS DEVICE TO CHALLENGE:</strong>
+          <span>Players on this device will only see the selected station's hardware console</span>
+        </div>
+        <div class="device-station-pills" id="deviceStationSelector">
+          <button class="st-pill active" data-st="1" type="button">STATION 01 (SYMBOLS)</button>
+          <button class="st-pill" data-st="2" type="button">STATION 02 (REACTOR)</button>
+          <button class="st-pill" data-st="3" type="button">STATION 03 (COMMS)</button>
+          <button class="st-pill" data-st="4" type="button">STATION 04 (CRYO)</button>
+          <button class="st-pill" data-st="5" type="button">STATION 05 (EXIT DOOR)</button>
+        </div>
       </div>
 
       <!-- Backend Navigation Tabs -->
@@ -408,63 +350,59 @@
           📦 2. REQUIRED MATERIALS &amp; ANSWER KEY
         </button>
         <button class="btab-btn" data-btab="tab-settings" type="button">
-          🎛️ 3. GAME SETTINGS &amp; CONTROLS
+          🎛️ 3. CONFIGURE THIS STATION
         </button>
       </div>
 
       <div class="backend-modal-body">
 
-        <!-- TAB 1: PRINTABLE EQUATION CLUES -->
+        <!-- TAB 1: PRINTABLE CLUES FOR SELECTED STATION -->
         <div class="btab-panel active" id="tab-clues">
           <div class="btab-top-bar">
-            <p>
-              These <strong>6 Equation Cards</strong> are generated by the backend. Print them out, cut along the dashed lines, and hide them around the physical room.
+            <p id="cluesTabIntro">
+              Printable room clue cards for the currently selected station. Print them out and hide them around this station's area.
             </p>
             <button class="backend-action-btn primary" onclick="window.print()" type="button">
-              🖨️ PRINT 6 CLUE CARDS
+              🖨️ PRINT CLUE CARDS
             </button>
           </div>
 
           <div class="printable-clues-grid" id="backendCluesGrid">
-            <!-- Populated dynamically from /api/config -->
+            <!-- Populated dynamically -->
           </div>
         </div>
 
-        <!-- TAB 2: REQUIRED MATERIALS & MASTER ANSWER KEY -->
+        <!-- TAB 2: REQUIRED MATERIALS & MASTER ANSWER KEY FOR ALL / SELECTED STATION -->
         <div class="btab-panel" id="tab-materials">
           <div class="answer-key-banner">
             <div class="ak-block">
-              <span class="ak-label">MASTER UNLOCK CODE</span>
+              <span class="ak-label" id="akStationLabel">STATION 01 MASTER UNLOCK CODE</span>
               <strong class="ak-code" id="backendMasterCode">578565</strong>
             </div>
             <div class="ak-block">
-              <span class="ak-label">SYMBOL VALUES</span>
-              <div class="ak-symbols" id="backendSymbolSummary">
-                ☢️=5 | ⚙️=7 | 🔺=8 | ☣️=5 | ❄️=6
-              </div>
+              <span class="ak-label">DIRECT DEVICE LINK</span>
+              <div class="ak-symbols" id="backendDirectLink">/#station-1</div>
             </div>
             <div class="ak-block">
-              <span class="ak-label">SESSION STATS</span>
-              <div class="ak-stats" id="backendStatsSummary">
-                Attempts: 0 | Solves: 0
-              </div>
+              <span class="ak-label">STATION SESSION STATS</span>
+              <div class="ak-stats" id="backendStatsSummary">Attempts: 0 | Solves: 0</div>
             </div>
           </div>
 
-          <h3 class="backend-sec-title">REQUIRED ROOM MATERIALS &amp; SETUP CHECKLIST</h3>
+          <h3 class="backend-sec-title" id="materialsSecTitle">REQUIRED MATERIALS &amp; SETUP CHECKLIST</h3>
           <div class="materials-list" id="backendMaterialsList">
-            <!-- Populated dynamically from /api/config -->
+            <!-- Populated dynamically -->
           </div>
         </div>
 
-        <!-- TAB 3: BACKEND SETTINGS & LIVE CONTROLS -->
+        <!-- TAB 3: BACKEND SETTINGS FOR SELECTED STATION -->
         <div class="btab-panel" id="tab-settings">
           <div class="settings-grid">
-            <!-- Symbol Values Editor -->
-            <div class="settings-card">
-              <h3>1. SYMBOL NUMERICAL VALUES (0–9)</h3>
-              <p class="settings-hint">Changing these values automatically updates all 6 equations and the 6-digit door unlock code on the backend:</p>
-              <div class="sym-config-list" id="symConfigInputs">
+            <!-- Left Settings Card: Station 1 Symbol Values OR Stations 2-5 Passcode & Clue Editor -->
+            <div class="settings-card" id="st1SymbolsCard">
+              <h3>STATION 01: SYMBOL NUMERICAL VALUES (0–9)</h3>
+              <p class="settings-hint">Changing these values automatically updates all 6 equations and the 6-digit door unlock code:</p>
+              <div class="sym-config-list">
                 <label class="sym-cfg-row">
                   <span>☢️ RADIATION</span>
                   <input type="number" min="0" max="9" id="cfg-sym-radiation" value="5" />
@@ -488,9 +426,28 @@
               </div>
             </div>
 
-            <!-- Display & Victory Screen Settings -->
+            <div class="settings-card hidden" id="stGenericCodeCard">
+              <h3 id="genCfgHeader">STATION PASSCODE &amp; CLUE CONFIG</h3>
+              <p class="settings-hint">Customize the target unlock code and printable clue card for this station:</p>
+              <div class="form-stack">
+                <label>
+                  <span>Station Header Title</span>
+                  <input type="text" id="cfgStationTitle" />
+                </label>
+                <label>
+                  <span>Target Unlock Code (Digits 0–9, up to 8 digits)</span>
+                  <input type="text" inputmode="numeric" maxlength="8" id="cfgStationCode" />
+                </label>
+                <label>
+                  <span>Printable Room Clue Text / Equation</span>
+                  <input type="text" id="cfgStationClue" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Right Settings Card: Green Screen & Live Operator Controls -->
             <div class="settings-card">
-              <h3>2. TERMINAL &amp; GREEN SCREEN SETTINGS</h3>
+              <h3>FULL-SCREEN GREEN VICTORY &amp; DISPLAY SETTINGS</h3>
               <div class="form-stack">
                 <label>
                   <span>Full-Screen Green Banner Title</span>
@@ -502,22 +459,22 @@
                 </label>
                 <label class="checkbox-row">
                   <input type="checkbox" id="cfgShowScratchpad" checked />
-                  <span>Show Optional Symbol Value Scratchpad on Left Bay</span>
+                  <span>Show Symbol Value Scratchpad on Left Bay</span>
                 </label>
               </div>
 
               <div class="settings-actions">
                 <button class="backend-action-btn primary" id="saveBackendConfigBtn" type="button">
-                  💾 SAVE SETTINGS TO BACKEND
+                  💾 SAVE STATION SETTINGS
                 </button>
                 <button class="backend-action-btn secondary" id="resetDefaultConfigBtn" type="button">
-                  ↺ RESTORE DEFAULT (578565)
+                  ↺ RESTORE ALL DEFAULTS
                 </button>
               </div>
               <div class="save-feedback" id="backendSaveFeedback"></div>
 
               <hr class="settings-divider" />
-              <h3>3. OPERATOR LIVE OVERRIDES</h3>
+              <h3>OPERATOR LIVE OVERRIDES (THIS DEVICE)</h3>
               <div class="operator-quick-btns">
                 <button class="backend-action-btn emerald" id="triggerGreenScreenBtn" type="button">
                   ✅ FORCE UNLOCK (TEST FULL GREEN SCREEN)

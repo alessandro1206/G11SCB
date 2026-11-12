@@ -1145,6 +1145,70 @@ body {
   color: var(--crimson-bright);
 }
 
+/* Device Challenge Assigner Bar inside Backend Portal */
+.device-assign-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: #121822;
+  border-bottom: 1px solid #283242;
+  flex-wrap: wrap;
+}
+
+.assign-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.assign-label strong {
+  font-size: 0.78rem;
+  color: var(--amber-glow);
+  letter-spacing: 0.08em;
+}
+
+.assign-label span {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.device-station-pills {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.st-pill {
+  background: #0a0d12;
+  border: 1px solid #334155;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.st-pill:hover {
+  border-color: var(--amber);
+  color: #fff;
+}
+
+.st-pill.active {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: var(--amber);
+  color: var(--amber-glow);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+}
+
+.settings-card.hidden {
+  display: none !important;
+}
+
 /* Backend Tabs */
 .backend-tabs {
   display: flex;
