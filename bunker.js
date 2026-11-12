@@ -1,111 +1,26 @@
 // ============================================================================
-// G11 SCB // BUNKER CONTROL TERMINAL - CORE LOGIC
+// G11-SCB // BLAST DOOR CONTROL TERMINAL MK-IV
+// Target Sequence: ☢️ (5) | ⚙️ (7) | 🔺 (8) | ☣️ (5) | ❄️ (6) | ☢️ (5)
 // ============================================================================
 
-const STORAGE_KEY = 'g11scb_bunker_state_v1';
+const TARGET_SEQUENCE = ['5', '7', '8', '5', '6', '5'];
 
-// Station 1 Target Sequence:
-// ☢️ = 5, ⚙️ = 7, 🔺 = 8, ☣️ = 5, ❄️ = 6
-// Sequence: ☢️ ⚙️ 🔺 ☣️ ❄️ ☢️ -> 5 7 8 5 6 5
-const ST1_TARGET_CODE = ['5', '7', '8', '5', '6', '5'];
-const ST1_SLOT_SYMBOLS = ['radiation', 'gear', 'triangle', 'biohazard', 'snowflake', 'radiation'];
-
-// Default configuration for Placeholder Stations 2-5
-const DEFAULT_GENERIC_STATIONS = {
-  2: {
-    id: 2,
-    tag: 'STATION 02 // SECTOR BETA',
-    title: 'SECTOR BETA: REACTOR OVERRIDE',
-    desc: 'Placeholder module for Station 02. Enter the Sector Beta override code discovered at Station 02, or use the Crew Configurator below to customize this challenge.',
-    code: '2026',
-    nextDirective: 'PROCEED IMMEDIATELY TO STATION 03'
-  },
-  3: {
-    id: 3,
-    tag: 'STATION 03 // SECTOR GAMMA',
-    title: 'SECTOR GAMMA: COMMS DECODER',
-    desc: 'Placeholder module for Station 03. Enter the Sector Gamma transmission cipher code, or use the Crew Configurator below to customize this challenge.',
-    code: '3115',
-    nextDirective: 'PROCEED IMMEDIATELY TO STATION 04'
-  },
-  4: {
-    id: 4,
-    tag: 'STATION 04 // SECTOR DELTA',
-    title: 'SECTOR DELTA: CRYO CONTAINMENT',
-    desc: 'Placeholder module for Station 04. Enter the thermal stabilization code, or use the Crew Configurator below to customize this challenge.',
-    code: '4409',
-    nextDirective: 'PROCEED IMMEDIATELY TO STATION 05'
-  },
-  5: {
-    id: 5,
-    tag: 'STATION 05 // SECTOR OMEGA',
-    title: 'SECTOR OMEGA: MAIN BLAST DOOR EXIT',
-    desc: 'Final Bunker Override Station. Enter the master evacuation sequence to unseal the surface blast doors and escape the bunker!',
-    code: '9999',
-    nextDirective: 'BUNKER EVACUATION COMPLETE — YOU ESCAPED!'
-  }
+let state = {
+  slots: ['', '', '', '', '', ''],
+  activeSlot: 0,
+  unlocked: false,
+  sfxEnabled: true
 };
-
-// Application State
-let appState = {
-  currentView: 'hub', // 'hub' | 'station-1' | 'station-2' | 'station-3' | 'station-4' | 'station-5'
-  sfxEnabled: true,
-  kioskLocked: false,
-  solvedStations: {
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false
-  },
-  st1Slots: ['', '', '', '', '', ''],
-  st1ActiveSlot: 0,
-  genericStations: JSON.parse(JSON.stringify(DEFAULT_GENERIC_STATIONS)),
-  activeGenericId: 2,
-  genericInput: ''
-};
-
-// Load saved state from localStorage
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.solvedStations) appState.solvedStations = { ...appState.solvedStations, ...parsed.solvedStations };
-      if (parsed.genericStations) appState.genericStations = { ...DEFAULT_GENERIC_STATIONS, ...parsed.genericStations };
-      if (typeof parsed.sfxEnabled === 'boolean') appState.sfxEnabled = parsed.sfxEnabled;
-    }
-  } catch (err) {
-    console.warn('Could not load saved bunker state:', err);
-  }
-}
-
-function saveState() {
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        solvedStations: appState.solvedStations,
-        genericStations: appState.genericStations,
-        sfxEnabled: appState.sfxEnabled
-      })
-    );
-  } catch (err) {
-    console.warn('Could not save bunker state:', err);
-  }
-}
 
 // ============================================================================
-// WEB AUDIO API SOUND SYNTHESIZER (NO EXTERNAL MP3 FILES NEEDED)
+// REALISTIC INDUSTRIAL SOUND SYNTHESIZER (WEB AUDIO API)
 // ============================================================================
 let audioCtx = null;
 
-function getAudioContext() {
+function getAudioCtx() {
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
-    }
+    if (AudioContextClass) audioCtx = new AudioContextClass();
   }
   if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
@@ -113,574 +28,372 @@ function getAudioContext() {
   return audioCtx;
 }
 
-function playTone(freq = 800, duration = 0.07, type = 'sine', gainVal = 0.12) {
-  if (!appState.sfxEnabled) return;
-  const ctx = getAudioContext();
+// Mechanical switch transient click + piezo tone
+function playMechKeySound(digit) {
+  if (!state.sfxEnabled) return;
+  const ctx = getAudioCtx();
   if (!ctx) return;
+
+  const now = ctx.currentTime;
+
+  // 1. Short mechanical switch click impulse
+  const clickOsc = ctx.createOscillator();
+  const clickGain = ctx.createGain();
+  clickOsc.type = 'square';
+  clickOsc.frequency.setValueAtTime(140, now);
+  clickOsc.frequency.exponentialRampToValueAtTime(45, now + 0.025);
+  clickGain.gain.setValueAtTime(0.18, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+  clickOsc.connect(clickGain);
+  clickGain.connect(ctx.destination);
+  clickOsc.start(now);
+  clickOsc.stop(now + 0.026);
+
+  // 2. High-tech piezo key beep
+  const beepOsc = ctx.createOscillator();
+  const beepGain = ctx.createGain();
+  const freq = 680 + (parseInt(digit, 10) || 0) * 42;
+  beepOsc.type = 'triangle';
+  beepOsc.frequency.setValueAtTime(freq, now + 0.01);
+  beepGain.gain.setValueAtTime(0.12, now + 0.01);
+  beepGain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+  beepOsc.connect(beepGain);
+  beepGain.connect(ctx.destination);
+  beepOsc.start(now + 0.01);
+  beepOsc.stop(now + 0.08);
+}
+
+function playControlClick() {
+  if (!state.sfxEnabled) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
 
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-  gain.gain.setValueAtTime(gainVal, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(420, now);
+  gain.gain.setValueAtTime(0.1, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
   osc.connect(gain);
   gain.connect(ctx.destination);
-
-  osc.start();
-  osc.stop(ctx.currentTime + duration);
+  osc.start(now);
+  osc.stop(now + 0.065);
 }
 
-function sfxKeyPress(digit) {
-  const baseFreq = 620 + (parseInt(digit, 10) || 0) * 38;
-  playTone(baseFreq, 0.065, 'triangle', 0.14);
+function playAlarmBuzzer() {
+  if (!state.sfxEnabled) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  [0, 0.2].forEach((offset, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(i === 0 ? 185 : 145, now + offset);
+    gain.gain.setValueAtTime(0.22, now + offset);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.17);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now + offset);
+    osc.stop(now + offset + 0.18);
+  });
 }
 
-function sfxActionKey() {
-  playTone(440, 0.08, 'sawtooth', 0.1);
-}
+function playAirlockUnlockSound() {
+  if (!state.sfxEnabled) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
 
-function sfxErrorAlarm() {
-  if (!appState.sfxEnabled) return;
-  playTone(190, 0.18, 'sawtooth', 0.2);
-  setTimeout(() => playTone(150, 0.25, 'sawtooth', 0.22), 190);
-}
+  // Heavy mechanical bolt thud
+  const boltOsc = ctx.createOscillator();
+  const boltGain = ctx.createGain();
+  boltOsc.type = 'sine';
+  boltOsc.frequency.setValueAtTime(110, now);
+  boltOsc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
+  boltGain.gain.setValueAtTime(0.3, now);
+  boltGain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+  boltOsc.connect(boltGain);
+  boltGain.connect(ctx.destination);
+  boltOsc.start(now);
+  boltOsc.stop(now + 0.37);
 
-function sfxAccessGranted() {
-  if (!appState.sfxEnabled) return;
-  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+  // Ascending confirmation chime
+  const notes = [523.25, 659.25, 783.99, 1046.5];
   notes.forEach((freq, idx) => {
-    setTimeout(() => playTone(freq, 0.16, 'triangle', 0.18), idx * 110);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    const start = now + 0.15 + idx * 0.11;
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0.16, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + 0.23);
   });
 }
 
 // ============================================================================
-// NAVIGATION & VIEW SWITCHING
+// UI RENDER & TERMINAL UPDATES
 // ============================================================================
-function switchView(targetView, updateHash = true) {
-  appState.currentView = targetView;
+function appendCrtLog(prefix, message, isHighlight = false) {
+  const logContainer = document.getElementById('crtLog');
+  if (!logContainer) return;
 
-  // Update top nav buttons
-  document.querySelectorAll('.nav-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.target === targetView);
-  });
+  const p = document.createElement('p');
+  p.className = isHighlight ? 'log-line highlight' : 'log-line';
+  p.innerHTML = `<span class="log-prefix">[${prefix}]</span> ${message}`;
+  logContainer.appendChild(p);
 
-  // Hide all view sections
-  document.querySelectorAll('.view-section').forEach((sec) => {
-    sec.classList.remove('active');
-  });
-
-  if (targetView === 'hub') {
-    document.getElementById('view-hub').classList.add('active');
-    renderHubStatus();
-  } else if (targetView === 'station-1') {
-    document.getElementById('view-station-1').classList.add('active');
-    renderStation1();
-  } else if (targetView.startsWith('station-')) {
-    const stNum = parseInt(targetView.replace('station-', ''), 10);
-    appState.activeGenericId = stNum;
-    appState.genericInput = '';
-    document.getElementById('view-station-generic').classList.add('active');
-    renderGenericStation(stNum);
-  }
-
-  if (updateHash) {
-    history.replaceState(null, '', `#${targetView}`);
+  // Keep max 5 lines in CRT monitor so it stays clean
+  while (logContainer.children.length > 5) {
+    logContainer.removeChild(logContainer.firstChild);
   }
 }
 
-function renderHubStatus() {
-  for (let i = 1; i <= 5; i++) {
-    const solved = !!appState.solvedStations[i];
-    const badge = document.getElementById(`hub-status-${i}`);
-    const card = document.querySelector(`.station-card[data-station="${i}"]`);
-    const navBtn = document.querySelector(`.nav-btn[data-target="station-${i}"]`);
+function renderConsole() {
+  const cells = document.querySelectorAll('#sequenceGrid .seq-cell');
+  cells.forEach((cell, idx) => {
+    const val = state.slots[idx];
+    const digitEl = document.getElementById(`digit-slot-${idx}`);
+    digitEl.textContent = val !== '' ? val : '-';
 
-    if (badge) {
-      badge.textContent = solved ? '✅ UNLOCKED' : '🔒 LOCKED';
-      badge.classList.toggle('unlocked', solved);
-    }
-    if (card) {
-      card.classList.toggle('solved-card', solved);
-    }
-    if (navBtn) {
-      navBtn.classList.toggle('solved', solved);
-    }
-
-    // Update customized title/desc on Hub for stations 2-5
-    if (i >= 2 && appState.genericStations[i]) {
-      const tEl = document.getElementById(`hub-title-${i}`);
-      const dEl = document.getElementById(`hub-desc-${i}`);
-      if (tEl) tEl.textContent = appState.genericStations[i].title;
-      if (dEl) dEl.textContent = appState.genericStations[i].desc;
-    }
-  }
-}
-
-// ============================================================================
-// STATION 01: SYMBOL EQUATION SEQUENCE LOCK (5 - 7 - 8 - 5 - 6 - 5)
-// ============================================================================
-function renderStation1() {
-  const isSolved = appState.solvedStations[1];
-  const slots = document.querySelectorAll('#st1SequenceRow .seq-slot');
-
-  slots.forEach((slotEl, idx) => {
-    const val = appState.st1Slots[idx];
-    const digitEl = document.getElementById(`st1-slot-${idx}`);
-    digitEl.textContent = val !== '' ? val : '_';
-
-    slotEl.classList.toggle('active', !isSolved && idx === appState.st1ActiveSlot);
-    slotEl.classList.toggle('filled', val !== '');
-    slotEl.classList.toggle('correct-slot', isSolved);
+    cell.classList.toggle('active', !state.unlocked && idx === state.activeSlot);
+    cell.classList.toggle('filled', val !== '');
+    cell.classList.toggle('verified', state.unlocked);
   });
 
-  const lockBadge = document.getElementById('st1LockBadge');
-  const consolePanel = document.getElementById('st1ConsolePanel');
-  const keypadWrapper = document.getElementById('st1KeypadWrapper');
-  const victoryOverlay = document.getElementById('st1VictoryOverlay');
-  const readout = document.getElementById('st1Readout');
+  const lockModule = document.getElementById('lockModule');
+  const securityChip = document.getElementById('securityChip');
+  const keypadDeck = document.getElementById('keypadDeck');
+  const unlockedChamber = document.getElementById('unlockedChamber');
+  const doorLamp = document.getElementById('doorStatusLamp');
+  const doorText = document.getElementById('doorStatusText');
 
-  if (isSolved) {
-    lockBadge.textContent = '🔓 AIRLOCK UNSEALED';
-    lockBadge.className = 'lock-state-badge unlocked';
-    consolePanel.classList.add('unlocked-panel');
-    keypadWrapper.style.display = 'none';
-    victoryOverlay.classList.remove('hidden');
-    readout.textContent = 'OVERRIDE SEQUENCE ACCEPTED // ACCESS GRANTED';
-    readout.className = 'terminal-readout success';
+  if (state.unlocked) {
+    lockModule.classList.add('unlocked-state');
+    securityChip.textContent = '🔓 OVERRIDE ACCEPTED';
+    securityChip.className = 'security-chip unlocked';
+    keypadDeck.style.display = 'none';
+    unlockedChamber.classList.remove('hidden');
+    doorLamp.className = 'led-lamp led-green';
+    doorText.textContent = 'UNSEALED';
   } else {
-    lockBadge.textContent = '🔒 AIRLOCK SEALED';
-    lockBadge.className = 'lock-state-badge locked';
-    consolePanel.classList.remove('unlocked-panel');
-    keypadWrapper.style.display = 'block';
-    victoryOverlay.classList.add('hidden');
+    lockModule.classList.remove('unlocked-state');
+    securityChip.textContent = '🔒 SECURITY LOCK ACTIVE';
+    securityChip.className = 'security-chip locked';
+    keypadDeck.style.display = 'block';
+    unlockedChamber.classList.add('hidden');
+    doorLamp.className = 'led-lamp led-red';
+    doorText.textContent = 'LOCKED';
   }
 }
 
-function handleSt1Key(key) {
-  if (appState.solvedStations[1]) return;
+function handleInputKey(key) {
+  if (state.unlocked) return;
 
-  const readout = document.getElementById('st1Readout');
-  readout.className = 'terminal-readout';
+  const vfd = document.getElementById('vfdReadout');
+  vfd.className = 'vfd-text';
 
   if (key === 'CLR') {
-    sfxActionKey();
-    appState.st1Slots = ['', '', '', '', '', ''];
-    appState.st1ActiveSlot = 0;
-    readout.textContent = 'SEQUENCE BUFFER CLEARED. AWAITING INPUT...';
-    renderStation1();
+    playControlClick();
+    state.slots = ['', '', '', '', '', ''];
+    state.activeSlot = 0;
+    vfd.textContent = 'BUFFER PURGED // AWAITING 6-DIGIT SEQUENCE...';
+    appendCrtLog('CLR', 'SEQUENCE MEMORY BUFFER CLEARED.');
+    renderConsole();
     return;
   }
 
   if (key === 'DEL') {
-    sfxActionKey();
-    if (appState.st1Slots[appState.st1ActiveSlot] !== '') {
-      appState.st1Slots[appState.st1ActiveSlot] = '';
-    } else if (appState.st1ActiveSlot > 0) {
-      appState.st1ActiveSlot--;
-      appState.st1Slots[appState.st1ActiveSlot] = '';
+    playControlClick();
+    if (state.slots[state.activeSlot] !== '') {
+      state.slots[state.activeSlot] = '';
+    } else if (state.activeSlot > 0) {
+      state.activeSlot--;
+      state.slots[state.activeSlot] = '';
     }
-    readout.textContent = 'DIGIT REMOVED.';
-    renderStation1();
+    vfd.textContent = `CHANNEL 0${state.activeSlot + 1} CLEARED`;
+    renderConsole();
     return;
   }
 
-  // Digit 0-9
   if (/^\d$/.test(key)) {
-    sfxKeyPress(key);
-    appState.st1Slots[appState.st1ActiveSlot] = key;
-    if (appState.st1ActiveSlot < 5) {
-      appState.st1ActiveSlot++;
+    playMechKeySound(key);
+    state.slots[state.activeSlot] = key;
+
+    const filledCount = state.slots.filter((s) => s !== '').length;
+    vfd.textContent = `CH-0${state.activeSlot + 1} SET TO [${key}] // (${filledCount}/6 ENTERED)`;
+
+    if (state.activeSlot < 5) {
+      state.activeSlot++;
     }
-    const enteredCount = appState.st1Slots.filter((x) => x !== '').length;
-    readout.textContent = `INPUT BUFFER: ${enteredCount}/6 SYMBOLS DECODED`;
-    renderStation1();
+    renderConsole();
   }
 }
 
-function verifySt1Sequence() {
-  if (appState.solvedStations[1]) return;
+function verifyOverrideSequence() {
+  if (state.unlocked) return;
 
-  const readout = document.getElementById('st1Readout');
-  const consolePanel = document.getElementById('st1ConsolePanel');
+  const vfd = document.getElementById('vfdReadout');
+  const lockModule = document.getElementById('lockModule');
 
-  if (appState.st1Slots.some((s) => s === '')) {
-    sfxErrorAlarm();
-    readout.textContent = '⚠️ INCOMPLETE SEQUENCE: ENTER ALL 6 SYMBOL DIGITS';
-    readout.className = 'terminal-readout error';
-    triggerShake(consolePanel);
+  if (state.slots.some((s) => s === '')) {
+    playAlarmBuzzer();
+    vfd.textContent = 'ERR // INCOMPLETE SEQUENCE: ALL 6 CHANNELS REQUIRED';
+    vfd.className = 'vfd-text vfd-error';
+    appendCrtLog('ERR', 'OVERRIDE REJECTED — INCOMPLETE 6-DIGIT INPUT.');
+    triggerConsoleShake(lockModule);
     return;
   }
 
-  const isMatch = appState.st1Slots.every((val, idx) => val === ST1_TARGET_CODE[idx]);
+  const isCorrect = state.slots.every((digit, idx) => digit === TARGET_SEQUENCE[idx]);
 
-  if (isMatch) {
-    sfxAccessGranted();
-    appState.solvedStations[1] = true;
-    saveState();
-    renderStation1();
-    renderHubStatus();
+  if (isCorrect) {
+    playAirlockUnlockSound();
+    state.unlocked = true;
+    vfd.textContent = 'SEQUENCE 5-7-8-5-6-5 VERIFIED // BLAST DOOR UNLOCKED';
+    vfd.className = 'vfd-text vfd-success';
+    appendCrtLog('AUTH', 'OVERRIDE CODE 578565 VERIFIED. AIRLOCK UNSEALED!', true);
+    renderConsole();
   } else {
-    sfxErrorAlarm();
-    const enteredStr = appState.st1Slots.join(' - ');
-    readout.textContent = `❌ ACCESS DENIED: SEQUENCE [${enteredStr}] INVALID`;
-    readout.className = 'terminal-readout error';
-    triggerShake(consolePanel);
+    playAlarmBuzzer();
+    const entered = state.slots.join('-');
+    vfd.textContent = `ACCESS DENIED // SEQUENCE [${entered}] INVALID`;
+    vfd.className = 'vfd-text vfd-error';
+    appendCrtLog('ALRM', `INVALID CODE [${entered}] — SECURITY LOCKOUT.`);
+    triggerConsoleShake(lockModule);
+
     setTimeout(() => {
-      appState.st1Slots = ['', '', '', '', '', ''];
-      appState.st1ActiveSlot = 0;
-      renderStation1();
+      state.slots = ['', '', '', '', '', ''];
+      state.activeSlot = 0;
+      renderConsole();
     }, 950);
   }
 }
 
-function resetStation1() {
-  sfxActionKey();
-  appState.solvedStations[1] = false;
-  appState.st1Slots = ['', '', '', '', '', ''];
-  appState.st1ActiveSlot = 0;
-  saveState();
-  const readout = document.getElementById('st1Readout');
-  readout.textContent = 'AWAITING 6-DIGIT SYMBOL OVERRIDE CODE...';
-  readout.className = 'terminal-readout';
-  renderStation1();
-  renderHubStatus();
+function resetAirlockSystem() {
+  playControlClick();
+  state.unlocked = false;
+  state.slots = ['', '', '', '', '', ''];
+  state.activeSlot = 0;
+
+  const vfd = document.getElementById('vfdReadout');
+  vfd.textContent = 'AWAITING 6-DIGIT SYMBOL OVERRIDE SEQUENCE...';
+  vfd.className = 'vfd-text';
+
+  const logContainer = document.getElementById('crtLog');
+  logContainer.innerHTML = `
+    <p class="log-line"><span class="log-prefix">[SYS]</span> AIRLOCK BLAST DOOR SEALED.</p>
+    <p class="log-line"><span class="log-prefix">[DIR]</span> FIND THE <strong>6 EQUATIONS</strong> SCATTERED IN THE ROOM.</p>
+    <p class="log-line"><span class="log-prefix">[DIR]</span> SOLVE THE VALUE OF EACH HAZARD SYMBOL.</p>
+    <p class="log-line highlight"><span class="log-prefix">[REQ]</span> INPUT THE 6-SYMBOL SEQUENCE TO UNLOCK DOOR.</p>
+  `;
+
+  renderConsole();
 }
 
-// Transfer values from the optional scratchpad into the 6 door slots
-function transferScratchpadToSequence() {
-  if (appState.solvedStations[1]) return;
-  const map = {};
-  document.querySelectorAll('.scratch-input').forEach((inp) => {
-    const val = inp.value.trim();
-    if (val !== '') {
-      map[inp.dataset.sym] = val.slice(-1); // single digit
-    }
-  });
-
-  let filledAny = false;
-  ST1_SLOT_SYMBOLS.forEach((symName, idx) => {
-    if (map[symName] !== undefined) {
-      appState.st1Slots[idx] = map[symName];
-      filledAny = true;
-    }
-  });
-
-  const readout = document.getElementById('st1Readout');
-  if (filledAny) {
-    sfxActionKey();
-    readout.textContent = 'SCRATCHPAD VALUES TRANSFERRED TO DOOR SEQUENCE.';
-    readout.className = 'terminal-readout';
-    // Move active cursor to first empty slot or last slot
-    const firstEmpty = appState.st1Slots.findIndex((s) => s === '');
-    appState.st1ActiveSlot = firstEmpty !== -1 ? firstEmpty : 5;
-    renderStation1();
-  } else {
-    sfxErrorAlarm();
-    readout.textContent = 'ENTER SYMBOL VALUES IN THE SCRATCHPAD FIRST.';
-    readout.className = 'terminal-readout error';
-  }
+function triggerConsoleShake(el) {
+  el.classList.remove('alarm-flash');
+  void el.offsetWidth;
+  el.classList.add('alarm-flash');
 }
 
 // ============================================================================
-// PLACEHOLDER STATIONS 02–05 (CONFIGURABLE TERMINALS)
-// ============================================================================
-function renderGenericStation(stNum) {
-  const cfg = appState.genericStations[stNum];
-  if (!cfg) return;
-
-  const isSolved = !!appState.solvedStations[stNum];
-
-  document.getElementById('genStationTag').textContent = cfg.tag;
-  document.getElementById('genStationTitle').textContent = cfg.title;
-  document.getElementById('genStationDesc').textContent = cfg.desc;
-  document.getElementById('genConsoleTag').textContent = `STATION 0${stNum} // OVERRIDE TERMINAL`;
-
-  // Populate Crew Configurator inputs
-  document.getElementById('cfgTitleInput').value = cfg.title;
-  document.getElementById('cfgDescInput').value = cfg.desc;
-  document.getElementById('cfgCodeInput').value = cfg.code;
-
-  // Format code display
-  const targetLen = cfg.code.length || 4;
-  let displayArr = [];
-  for (let i = 0; i < targetLen; i++) {
-    displayArr.push(appState.genericInput[i] !== undefined ? appState.genericInput[i] : '_');
-  }
-  document.getElementById('genCodeDisplay').textContent = displayArr.join(' ');
-
-  const lockBadge = document.getElementById('genLockBadge');
-  const consolePanel = document.getElementById('genConsolePanel');
-  const keypadWrapper = document.getElementById('genKeypadWrapper');
-  const victoryOverlay = document.getElementById('genVictoryOverlay');
-  const readout = document.getElementById('genReadout');
-
-  if (isSolved) {
-    lockBadge.textContent = '🔓 OVERRIDE COMPLETE';
-    lockBadge.className = 'lock-state-badge unlocked';
-    consolePanel.classList.add('unlocked-panel');
-    keypadWrapper.style.display = 'none';
-    victoryOverlay.classList.remove('hidden');
-    document.getElementById('genNextDirective').textContent = cfg.nextDirective;
-    readout.textContent = 'AUTHORIZATION ACCEPTED // STATION UNLOCKED';
-    readout.className = 'terminal-readout success';
-  } else {
-    lockBadge.textContent = '🔒 SYSTEM LOCKED';
-    lockBadge.className = 'lock-state-badge locked';
-    consolePanel.classList.remove('unlocked-panel');
-    keypadWrapper.style.display = 'block';
-    victoryOverlay.classList.add('hidden');
-  }
-}
-
-function handleGenericKey(key) {
-  const stNum = appState.activeGenericId;
-  if (appState.solvedStations[stNum]) return;
-  const cfg = appState.genericStations[stNum];
-  const maxLen = cfg.code.length || 4;
-  const readout = document.getElementById('genReadout');
-  readout.className = 'terminal-readout';
-
-  if (key === 'CLR') {
-    sfxActionKey();
-    appState.genericInput = '';
-    readout.textContent = 'INPUT CLEARED.';
-    renderGenericStation(stNum);
-    return;
-  }
-
-  if (key === 'DEL') {
-    sfxActionKey();
-    appState.genericInput = appState.genericInput.slice(0, -1);
-    renderGenericStation(stNum);
-    return;
-  }
-
-  if (/^\d$/.test(key) && appState.genericInput.length < maxLen) {
-    sfxKeyPress(key);
-    appState.genericInput += key;
-    renderGenericStation(stNum);
-  }
-}
-
-function verifyGenericCode() {
-  const stNum = appState.activeGenericId;
-  if (appState.solvedStations[stNum]) return;
-  const cfg = appState.genericStations[stNum];
-  const readout = document.getElementById('genReadout');
-  const consolePanel = document.getElementById('genConsolePanel');
-
-  if (appState.genericInput === cfg.code) {
-    sfxAccessGranted();
-    appState.solvedStations[stNum] = true;
-    saveState();
-    renderGenericStation(stNum);
-    renderHubStatus();
-  } else {
-    sfxErrorAlarm();
-    readout.textContent = '❌ INVALID OVERRIDE CODE — ACCESS DENIED';
-    readout.className = 'terminal-readout error';
-    triggerShake(consolePanel);
-    setTimeout(() => {
-      appState.genericInput = '';
-      renderGenericStation(stNum);
-    }, 800);
-  }
-}
-
-function triggerShake(el) {
-  el.classList.remove('error-shake');
-  void el.offsetWidth; // force reflow
-  el.classList.add('error-shake');
-}
-
-// ============================================================================
-// EVENT LISTENERS & INITIALIZATION
+// INITIALIZE EVENT LISTENERS
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  loadState();
+  // Sequence Slot Click Selection
+  document.querySelectorAll('#sequenceGrid .seq-cell').forEach((cell) => {
+    cell.addEventListener('click', () => {
+      if (state.unlocked) return;
+      playControlClick();
+      state.activeSlot = parseInt(cell.dataset.slot, 10);
+      renderConsole();
+    });
+  });
 
-  // Top Navigation Buttons
-  document.querySelectorAll('.nav-btn').forEach((btn) => {
+  // Mechanical Keypad Clicks
+  document.querySelectorAll('#mechKeypad .mech-key').forEach((btn) => {
     btn.addEventListener('click', () => {
-      sfxActionKey();
-      switchView(btn.dataset.target);
+      handleInputKey(btn.dataset.key);
     });
   });
 
-  // Hub Launch Buttons & Next Station Buttons
-  document.querySelectorAll('[data-launch]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      sfxActionKey();
-      switchView(btn.dataset.launch);
-    });
+  // Engage Override Actuator
+  document.getElementById('engageOverrideBtn').addEventListener('click', verifyOverrideSequence);
+
+  // Relock / Reset Button for next team
+  document.getElementById('relockSystemBtn').addEventListener('click', resetAirlockSystem);
+
+  // Reset Scratchpad Log
+  document.getElementById('clearNotesBtn').addEventListener('click', () => {
+    playControlClick();
+    document.querySelectorAll('.sym-note-input').forEach((inp) => (inp.value = ''));
+    appendCrtLog('LOG', 'FIELD SYMBOL NOTES CLEARED.');
   });
 
-  // Station 1 Slot Selection
-  document.querySelectorAll('#st1SequenceRow .seq-slot').forEach((slotEl) => {
-    slotEl.addEventListener('click', () => {
-      if (appState.solvedStations[1]) return;
-      sfxActionKey();
-      appState.st1ActiveSlot = parseInt(slotEl.dataset.slot, 10);
-      renderStation1();
-    });
-  });
-
-  // Station 1 Keypad Buttons
-  document.querySelectorAll('#st1Keypad .key-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      handleSt1Key(btn.dataset.key);
-    });
-  });
-
-  document.getElementById('st1SubmitBtn').addEventListener('click', verifySt1Sequence);
-  document.getElementById('st1ResetBtn').addEventListener('click', resetStation1);
-
-  // Scratchpad controls
-  document.getElementById('applyScratchpadBtn').addEventListener('click', transferScratchpadToSequence);
-  document.getElementById('clearScratchpadBtn').addEventListener('click', () => {
-    sfxActionKey();
-    document.querySelectorAll('.scratch-input').forEach((inp) => (inp.value = ''));
-  });
-
-  // Generic Station Keypad Buttons
-  document.querySelectorAll('#genKeypad .key-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      handleGenericKey(btn.dataset.gkey);
-    });
-  });
-
-  document.getElementById('genSubmitBtn').addEventListener('click', verifyGenericCode);
-  document.getElementById('genResetBtn').addEventListener('click', () => {
-    const stNum = appState.activeGenericId;
-    sfxActionKey();
-    appState.solvedStations[stNum] = false;
-    appState.genericInput = '';
-    saveState();
-    renderGenericStation(stNum);
-    renderHubStatus();
-  });
-
-  // Save Generic Station Config
-  document.getElementById('saveStationConfigBtn').addEventListener('click', () => {
-    const stNum = appState.activeGenericId;
-    const newTitle = document.getElementById('cfgTitleInput').value.trim();
-    const newDesc = document.getElementById('cfgDescInput').value.trim();
-    const newCode = document.getElementById('cfgCodeInput').value.trim().replace(/\s+/g, '');
-
-    if (newTitle) appState.genericStations[stNum].title = newTitle;
-    if (newDesc) appState.genericStations[stNum].desc = newDesc;
-    if (newCode) appState.genericStations[stNum].code = newCode;
-
-    appState.genericInput = '';
-    saveState();
-    sfxAccessGranted();
-    renderGenericStation(stNum);
-    renderHubStatus();
-    const readout = document.getElementById('genReadout');
-    readout.textContent = '✅ STATION CONFIGURATION SAVED LOCALLY';
-    readout.className = 'terminal-readout success';
-  });
-
-  // Physical Keyboard Support for Station 1 & Generic Stations
-  window.addEventListener('keydown', (e) => {
-    // Ignore keyboard shortcuts if typing inside an input or textarea
-    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-
-    if (appState.currentView === 'station-1' && !appState.solvedStations[1]) {
-      if (e.key >= '0' && e.key <= '9') {
-        handleSt1Key(e.key);
-      } else if (e.key === 'Backspace') {
-        handleSt1Key('DEL');
-      } else if (e.key === 'Escape') {
-        handleSt1Key('CLR');
-      } else if (e.key === 'Enter') {
-        verifySt1Sequence();
-      } else if (e.key === 'ArrowLeft' && appState.st1ActiveSlot > 0) {
-        appState.st1ActiveSlot--;
-        renderStation1();
-      } else if (e.key === 'ArrowRight' && appState.st1ActiveSlot < 5) {
-        appState.st1ActiveSlot++;
-        renderStation1();
-      }
-    } else if (appState.currentView.startsWith('station-') && appState.currentView !== 'station-1') {
-      const stNum = appState.activeGenericId;
-      if (!appState.solvedStations[stNum]) {
-        if (e.key >= '0' && e.key <= '9') {
-          handleGenericKey(e.key);
-        } else if (e.key === 'Backspace') {
-          handleGenericKey('DEL');
-        } else if (e.key === 'Escape') {
-          handleGenericKey('CLR');
-        } else if (e.key === 'Enter') {
-          verifyGenericCode();
-        }
-      }
-    }
-  });
-
-  // Utility Buttons: SFX Toggle, Kiosk Station Lock, Fullscreen
-  const sfxBtn = document.getElementById('sfxToggleBtn');
-  const updateSfxLabel = () => {
-    sfxBtn.textContent = appState.sfxEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
-  };
-  updateSfxLabel();
+  // Audio Rocker Switch
+  const sfxBtn = document.getElementById('sfxSwitchBtn');
+  const sfxLabel = document.getElementById('sfxSwitchLabel');
   sfxBtn.addEventListener('click', () => {
-    appState.sfxEnabled = !appState.sfxEnabled;
-    updateSfxLabel();
-    saveState();
-    if (appState.sfxEnabled) sfxActionKey();
+    state.sfxEnabled = !state.sfxEnabled;
+    sfxBtn.classList.toggle('active', state.sfxEnabled);
+    sfxLabel.textContent = state.sfxEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
+    if (state.sfxEnabled) playControlClick();
   });
 
-  const kioskBtn = document.getElementById('kioskLockBtn');
-  const stationNav = document.getElementById('stationNav');
-  kioskBtn.addEventListener('click', () => {
-    appState.kioskLocked = !appState.kioskLocked;
-    stationNav.classList.toggle('kiosk-hidden', appState.kioskLocked);
-    kioskBtn.classList.toggle('locked-kiosk', appState.kioskLocked);
-    kioskBtn.textContent = appState.kioskLocked ? '🔒 STATION LOCKED' : '🔓 STATION UNLOCKED';
-    sfxActionKey();
-  });
-
-  document.getElementById('fullscreenBtn').addEventListener('click', () => {
+  // Fullscreen Rocker Switch
+  const fsBtn = document.getElementById('fullscreenSwitchBtn');
+  fsBtn.addEventListener('click', () => {
+    playControlClick();
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
+      fsBtn.classList.add('active');
     } else {
       document.exitFullscreen().catch(() => {});
+      fsBtn.classList.remove('active');
     }
   });
 
-  // Reset All Stations Button
-  document.getElementById('resetAllBtn').addEventListener('click', () => {
-    sfxActionKey();
-    appState.solvedStations = { 1: false, 2: false, 3: false, 4: false, 5: false };
-    appState.st1Slots = ['', '', '', '', '', ''];
-    appState.st1ActiveSlot = 0;
-    appState.genericInput = '';
-    saveState();
-    renderHubStatus();
+  // Physical Keyboard Support
+  window.addEventListener('keydown', (e) => {
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    if (!state.unlocked) {
+      if (e.key >= '0' && e.key <= '9') {
+        animateKeycapPress(e.key);
+        handleInputKey(e.key);
+      } else if (e.key === 'Backspace') {
+        animateKeycapPress('DEL');
+        handleInputKey('DEL');
+      } else if (e.key === 'Escape') {
+        animateKeycapPress('CLR');
+        handleInputKey('CLR');
+      } else if (e.key === 'Enter') {
+        verifyOverrideSequence();
+      } else if (e.key === 'ArrowLeft' && state.activeSlot > 0) {
+        playControlClick();
+        state.activeSlot--;
+        renderConsole();
+      } else if (e.key === 'ArrowRight' && state.activeSlot < 5) {
+        playControlClick();
+        state.activeSlot++;
+        renderConsole();
+      }
+    }
   });
 
-  // Clues Reference Modal
-  const cluesModal = document.getElementById('cluesModal');
-  document.getElementById('openCluesModalBtn').addEventListener('click', () => {
-    sfxActionKey();
-    cluesModal.classList.remove('hidden');
-  });
-  document.getElementById('closeCluesModalBtn').addEventListener('click', () => {
-    cluesModal.classList.add('hidden');
-  });
-  document.getElementById('closeCluesModalBtn2').addEventListener('click', () => {
-    cluesModal.classList.add('hidden');
-  });
-
-  // Check initial URL hash (e.g., #station-1)
-  const initialHash = window.location.hash.replace('#', '');
-  if (['hub', 'station-1', 'station-2', 'station-3', 'station-4', 'station-5'].includes(initialHash)) {
-    switchView(initialHash, false);
-  } else {
-    switchView('hub', false);
-  }
+  renderConsole();
 });
+
+function animateKeycapPress(keyVal) {
+  const btn = document.querySelector(`#mechKeypad .mech-key[data-key="${keyVal}"]`);
+  if (!btn) return;
+  btn.classList.add('pressed');
+  setTimeout(() => btn.classList.remove('pressed'), 120);
+}
