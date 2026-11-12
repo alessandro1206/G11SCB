@@ -85,26 +85,50 @@ const DEFAULT_BACKEND_DATA = {
     },
     3: {
       id: 3,
-      type: 'code-lock',
-      serial: 'UNIT: G11-SCB // SEC-03 // MK-IV',
-      title: 'STATION 03: BUNKER COMMS DECODER',
-      code: '3115',
-      slotGlyphs: ['📡', '📻', '🛰️', '📡', '🔒', '⚡'],
+      type: 'circuit-lab',
+      serial: 'UNIT: G11-SCB // SEC-03 // CIRCUIT-MK-IV',
+      title: 'STATION 03: EMERGENCY CIRCUIT & CONDUCTOR LAB',
+      code: 'CONDUCTOR',
       crtLines: [
-        '[SYS] SECTOR GAMMA COMMUNICATIONS ARRAY LOCKED.',
-        '[DIR] DECODE THE INTERCEPTED BUNKER TRANSMISSION AT STATION 03.',
-        '[DIR] EXTRACT THE NUMERICAL CIPHER KEY.',
-        '[REQ] INPUT CIPHER KEY TO RESTORE COMMS.'
+        '[SYS] EMERGENCY CORRIDOR LIGHT BULB OFFLINE — WIRE SEVERED.',
+        '[DIR] STEP 1: ASSEMBLE THE SIMPLE CIRCUIT (BATTERY + WIRES + BULB).',
+        '[DIR] STEP 2: SELECT A CONDUCTIVE MATERIAL TO REPLACE THE BROKEN WIRE.',
+        '[REQ] STEP 3: ENGAGE BREAKER TO LIGHT UP THE BULB & REVEAL THE DOOR!'
       ],
       showScratchpad: false,
-      victoryTitle: 'ACCESS GRANTED',
-      victorySubtitle: 'STATION 03 COMPLETE — PROCEED IMMEDIATELY TO STATION 04',
+      victoryTitle: 'ACCESS GRANTED // CIRCUIT ENERGIZED',
+      victorySubtitle: 'EMERGENCY BULB LIT — HIDDEN DOOR UNLOCKED! PROCEED TO STATION 04',
+      circuitMaterials: [
+        { id: 'wood', name: 'DRY WOODEN STICK', icon: '🪵', isConductor: false, resistance: '∞ Ω', reason: 'Wood is an electrical insulator — electrons cannot flow through it.' },
+        { id: 'copper', name: 'COPPER WIRE / COIN', icon: '🪙', isConductor: true, resistance: '0.02 Ω', reason: 'Copper is an excellent metallic conductor! Current flows to light the bulb.' },
+        { id: 'rubber', name: 'RUBBER ERASER STRIP', icon: '🛞', isConductor: false, resistance: '∞ Ω', reason: 'Rubber is a high-resistance insulator used to block electricity.' },
+        { id: 'nail', name: 'IRON / STEEL NAIL', icon: '🔩', isConductor: true, resistance: '0.09 Ω', reason: 'Iron/Steel is a conductive metal that bridges the broken wire gap!' },
+        { id: 'plastic', name: 'PLASTIC RULER', icon: '📏', isConductor: false, resistance: '∞ Ω', reason: 'Plastic is a polymer insulator — circuit remains open.' },
+        { id: 'foil', name: 'ALUMINUM FOIL STRIP', icon: '✨', isConductor: true, resistance: '0.04 Ω', reason: 'Aluminum is a lightweight metal conductor that completes the circuit!' },
+        { id: 'glass', name: 'GLASS TEST ROD', icon: '🧪', isConductor: false, resistance: '∞ Ω', reason: 'Glass is a dielectric insulator — zero current flow.' },
+        { id: 'key', name: 'BRASS / METAL KEY', icon: '🔑', isConductor: true, resistance: '0.06 Ω', reason: 'Brass/Metal alloy conducts electricity and ignites the emergency bulb!' }
+      ],
       clues: [
-        { title: 'STATION 03 CLUE #1', formula: 'COMMS CIPHER: 3115', note: 'Customize this clue in Backend Settings once Challenge 3 is finalized.' }
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #1',
+          formula: '🔋 + ➖ + 💡 + [METAL] = 💡✨',
+          note: 'To complete a simple circuit, connect a Power Source (Battery), Conductive Path (Wires), and Load (Light Bulb) in a closed loop.'
+        },
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #2',
+          formula: 'CONDUCTORS: 🪙 🔩 ✨ 🔑',
+          note: 'Metals (Copper, Iron, Aluminum, Brass) have free electrons that allow electrical current to replace a broken wire.'
+        },
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #3',
+          formula: 'INSULATORS: 🪵 🛞 📏 🧪',
+          note: 'Wood, Rubber, Plastic, and Glass block electrical current and will NOT light the bulb.'
+        }
       ],
       materials: [
-        { item: 'Device #3 (Laptop/Tablet) locked to Station 03', detail: 'Open /#station-3 in Fullscreen mode at Station 03.', category: 'HARDWARE' },
-        { item: 'Station 03 Physical Clues / Props', detail: 'Customizable in the Backend Settings tab as soon as Challenge 3 is ready.', category: 'PROPS' }
+        { item: 'Device #3 (Laptop/Tablet) locked to Station 03', detail: 'Open /#station-3 in Fullscreen mode to run the Interactive Circuit & Material Lab.', category: 'HARDWARE' },
+        { item: '3 Printable Circuit & Conductor Clue Cards', detail: 'Print from the Backend Clues Tab and hide around Station 03.', category: 'PRINTABLE PROPS' },
+        { item: 'Optional Real-Life Demo Props (Battery, Bulb, Alligator Clips, Test Objects)', detail: 'Optional physical props next to the tablet: Copper coin, iron nail, aluminum foil, wooden stick, rubber eraser, plastic ruler.', category: 'SCIENCE PROPS' }
       ],
       stats: { attempts: 0, solves: 0 }
     },
@@ -161,7 +185,7 @@ const DEFAULT_BACKEND_DATA = {
   }
 };
 
-const TMP_CONFIG_PATH = path.join(os.tmpdir(), 'g11scb_bunker_multistation_v2.json');
+const TMP_CONFIG_PATH = path.join(os.tmpdir(), 'g11scb_bunker_multistation_v3.json');
 
 function loadBackendData() {
   try {
@@ -249,9 +273,10 @@ function buildComputedState(data) {
   computedStations[1].sequenceSlots = st1SequenceSlots;
   computedStations[1].equations = station1Equations;
 
-  // Build slot descriptors for Stations 2–5 based on their code length
-  for (let i = 2; i <= 5; i++) {
+  // Build slot descriptors for code-lock stations
+  [2, 4, 5].forEach((i) => {
     const st = computedStations[i];
+    if (!st) return;
     const codeStr = String(st.code || '0000');
     const glyphs = st.slotGlyphs || ['⚡', '🔒', '☢️', '⚙️', '🔺', '❄️'];
     st.sequenceSlots = codeStr.split('').map((digit, idx) => ({
@@ -259,6 +284,16 @@ function buildComputedState(data) {
       glyph: glyphs[idx % glyphs.length],
       value: digit
     }));
+  });
+
+  // Station 3 verified display badges for Full-Screen Green screen
+  if (computedStations[3]) {
+    computedStations[3].sequenceSlots = [
+      { slot: 1, glyph: '🔋', value: '12V' },
+      { slot: 2, glyph: '⚡', value: 'WIRE' },
+      { slot: 3, glyph: '🪙', value: 'METAL' },
+      { slot: 4, glyph: '💡', value: 'LIT' }
+    ];
   }
 
   return {
@@ -329,13 +364,14 @@ async function requestHandler(req, res) {
         if (typeof body.victoryTitle === 'string' && body.victoryTitle.trim()) st.victoryTitle = body.victoryTitle.trim();
         if (typeof body.victorySubtitle === 'string' && body.victorySubtitle.trim()) st.victorySubtitle = body.victorySubtitle.trim();
         if (typeof body.showScratchpad === 'boolean') st.showScratchpad = body.showScratchpad;
-        if (stId >= 2 && typeof body.code === 'string' && body.code.trim()) {
+
+        if (st.type === 'code-lock' && typeof body.code === 'string' && body.code.trim()) {
           st.code = body.code.trim().replace(/\s+/g, '').slice(0, 8);
         }
-        if (Array.isArray(body.crtLines) && body.crtLines.length > 0) {
-          st.crtLines = body.crtLines;
+        if (st.type === 'circuit-lab' && Array.isArray(body.circuitMaterials)) {
+          st.circuitMaterials = body.circuitMaterials;
         }
-        if (stId >= 2 && typeof body.clueFormula === 'string' && body.clueFormula.trim()) {
+        if (st.type === 'code-lock' && typeof body.clueFormula === 'string' && body.clueFormula.trim()) {
           st.clues = [
             {
               title: `STATION 0${stId} CLUE CARD`,
@@ -357,14 +393,19 @@ async function requestHandler(req, res) {
       const computed = buildComputedState(current);
       const targetStation = computed.stations[stId] || computed.stations[1];
 
-      const enteredCode = Array.isArray(body.slots)
-        ? body.slots.join('')
-        : String(body.code || '');
-
       current.stations[stId].stats = current.stations[stId].stats || { attempts: 0, solves: 0 };
       current.stations[stId].stats.attempts += 1;
 
-      const success = enteredCode === String(targetStation.code);
+      let success = false;
+      if (targetStation.type === 'circuit-lab') {
+        success = !!body.circuitComplete;
+      } else {
+        const enteredCode = Array.isArray(body.slots)
+          ? body.slots.join('')
+          : String(body.code || '');
+        success = enteredCode === String(targetStation.code);
+      }
+
       if (success) {
         current.stations[stId].stats.solves += 1;
       }
@@ -373,7 +414,6 @@ async function requestHandler(req, res) {
       return sendJson(res, 200, {
         success,
         stationId: stId,
-        enteredCode,
         victoryTitle: targetStation.victoryTitle,
         victorySubtitle: targetStation.victorySubtitle,
         stats: current.stations[stId].stats

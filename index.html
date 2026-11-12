@@ -120,7 +120,7 @@
     <!-- Main Dual-Bay Hardware Console -->
     <main class="console-bays">
 
-      <!-- ==================== LEFT BAY: CRT MONITOR & DECODER MATRIX ==================== -->
+      <!-- ==================== LEFT BAY: CRT MONITOR & SIDE MODULE ==================== -->
       <section class="bay-left">
         <!-- Recessed Green/Amber Phosphor CRT Display -->
         <div class="crt-bezel">
@@ -148,7 +148,7 @@
           </div>
         </div>
 
-        <!-- Physical Field Decoder Scratchpad Module -->
+        <!-- Physical Field Decoder Scratchpad Module (For Station 01) -->
         <div class="hardware-module scratchpad-module" id="scratchpadModule">
           <div class="module-title-bar">
             <span class="module-code">MOD-02 // SYMBOL VALUE LOG</span>
@@ -215,10 +215,59 @@
             </label>
           </div>
         </div>
+
+        <!-- Digital Multimeter & Circuit Assembly Checklist (For Station 03 Circuit Challenge) -->
+        <div class="hardware-module circuit-telemetry-module hidden" id="circuitTelemetryModule">
+          <div class="module-title-bar">
+            <span class="module-code">MOD-03 // DIGITAL MULTIMETER &amp; OHMMETER</span>
+            <button class="recessed-mini-btn" id="resetCircuitBtn" type="button">↺ RESET CIRCUIT</button>
+          </div>
+
+          <div class="multimeter-grid">
+            <div class="meter-box">
+              <span class="meter-label">BUS VOLTAGE</span>
+              <span class="meter-val" id="meterVoltage">0.0 V</span>
+            </div>
+            <div class="meter-box">
+              <span class="meter-label">CURRENT FLOW</span>
+              <span class="meter-val" id="meterCurrent">0.00 A</span>
+            </div>
+            <div class="meter-box">
+              <span class="meter-label">GAP RESISTANCE</span>
+              <span class="meter-val" id="meterResistance">--- Ω</span>
+            </div>
+            <div class="meter-box">
+              <span class="meter-label">BULB OUTPUT</span>
+              <span class="meter-val" id="meterLumens">0 LM</span>
+            </div>
+          </div>
+
+          <div class="circuit-steps-box">
+            <div class="cstep-title">CIRCUIT ASSEMBLY PROTOCOL:</div>
+            <div class="cstep-item" id="cstep-battery">
+              <span class="cstep-dot"></span>
+              <span>1. Install 12V DC Battery Power Source</span>
+            </div>
+            <div class="cstep-item" id="cstep-wire">
+              <span class="cstep-dot"></span>
+              <span>2. Connect Positive Copper Wire Lead</span>
+            </div>
+            <div class="cstep-item" id="cstep-bulb">
+              <span class="cstep-dot"></span>
+              <span>3. Screw In Emergency Filament Light Bulb</span>
+            </div>
+            <div class="cstep-item" id="cstep-material">
+              <span class="cstep-dot"></span>
+              <span>4. Bridge Broken Wire with Conductive Material</span>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- ==================== RIGHT BAY: SEQUENCE DECODER & MECHANICAL KEYPAD ==================== -->
+      <!-- ==================== RIGHT BAY: KEYPAD CONSOLE OR CIRCUIT LAB ==================== -->
       <section class="bay-right">
+
+        <!-- MODE A: KEYPAD SEQUENCE CONSOLE (Stations 1, 2, 4, 5) -->
         <div class="hardware-module lock-module" id="lockModule">
           <div class="module-title-bar">
             <span class="module-code" id="lockModuleCode">MOD-01 // BLAST DOOR SEQUENCE MATRIX</span>
@@ -230,7 +279,7 @@
             <div class="housing-label" id="sequenceHousingLabel">REQUIRED DOOR UNLOCK SEQUENCE</div>
 
             <div class="sequence-cells-grid" id="sequenceGrid">
-              <!-- Populated dynamically with the station's slots (e.g., 6 symbol cells for Station 1, or N cells for Stations 2-5) -->
+              <!-- Populated dynamically -->
             </div>
           </div>
 
@@ -299,8 +348,99 @@
               </button>
             </div>
           </div>
-
         </div>
+
+        <!-- MODE B: STATION 03 INTERACTIVE SIMPLE CIRCUIT & MATERIAL LAB -->
+        <div class="hardware-module circuit-lab-module hidden" id="circuitLabModule">
+          <div class="module-title-bar">
+            <span class="module-code">MOD-03 // SIMPLE CIRCUIT &amp; CONDUCTOR TEST BENCH</span>
+            <span class="security-chip locked" id="circuitStatusChip">⚡ CIRCUIT DE-ENERGIZED</span>
+          </div>
+
+          <!-- Interactive Circuit Schematic Workbench -->
+          <div class="circuit-board-well" id="circuitBoardWell">
+            <div class="circuit-board-instruction">
+              CLICK SLOTS 1, 2, AND 3 TO ASSEMBLE THE CIRCUIT — THEN CLAMP A CONDUCTIVE MATERIAL INTO SLOT 4:
+            </div>
+
+            <div class="circuit-schematic-stage" id="circuitStage">
+              <!-- Animated SVG Circuit Loop Traces -->
+              <svg class="circuit-traces-svg" viewBox="0 0 600 260" preserveAspectRatio="none">
+                <!-- Base dark copper trace loop -->
+                <rect x="70" y="38" width="460" height="184" rx="18" class="trace-base" />
+                <!-- Active glowing electron flow trace (visible when energized with conductor) -->
+                <rect x="70" y="38" width="460" height="184" rx="18" class="trace-electrons" id="electronTrace" />
+              </svg>
+
+              <!-- TOP NODE: Slot 2 - Positive Copper Wire Lead -->
+              <button class="circuit-node node-top" id="nodeWireBtn" type="button">
+                <span class="node-step-badge">SLOT 2 // TOP LEAD</span>
+                <div class="node-visual" id="nodeWireVisual">➕ CLICK TO CONNECT COPPER WIRE</div>
+                <span class="node-status-tag" id="nodeWireTag">DISCONNECTED</span>
+              </button>
+
+              <!-- LEFT NODE: Slot 1 - 12V Battery Power Cell -->
+              <button class="circuit-node node-left" id="nodeBatteryBtn" type="button">
+                <span class="node-step-badge">SLOT 1 // POWER SOURCE</span>
+                <div class="node-visual" id="nodeBatteryVisual">🔋 CLICK TO MOUNT 12V BATTERY</div>
+                <span class="node-status-tag" id="nodeBatteryTag">EMPTY SOCKET</span>
+              </button>
+
+              <!-- CENTER ILLUMINATED DOOR FINDER BEACON -->
+              <div class="circuit-center-beacon" id="circuitCenterBeacon">
+                <div class="bulb-dome" id="bulbDome">
+                  <span class="bulb-icon">💡</span>
+                </div>
+                <div class="beacon-caption" id="beaconCaption">BULB OFFLINE — DARK CORRIDOR</div>
+              </div>
+
+              <!-- RIGHT NODE: Slot 3 - Emergency Light Bulb -->
+              <button class="circuit-node node-right" id="nodeBulbBtn" type="button">
+                <span class="node-step-badge">SLOT 3 // LOAD SOCKET</span>
+                <div class="node-visual" id="nodeBulbVisual">💡 CLICK TO SCREW IN LIGHT BULB</div>
+                <span class="node-status-tag" id="nodeBulbTag">UNINSTALLED</span>
+              </button>
+
+              <!-- BOTTOM NODE: Slot 4 - Severed Wire Alligator Clips (Material Bridge) -->
+              <div class="circuit-node node-bottom" id="nodeGapBox">
+                <span class="node-step-badge">SLOT 4 // BROKEN WIRE GAP (ALLIGATOR CLIPS)</span>
+                <div class="alligator-gap-row">
+                  <span class="clip-jaw">🐊 CLIP-L</span>
+                  <div class="clamped-material-slot" id="clampedMaterialDisplay">
+                    ⚠️ WIRE SEVERED — SELECT A MATERIAL BELOW
+                  </div>
+                  <span class="clip-jaw">CLIP-R 🐊</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VFD Status Readout for Circuit Lab -->
+          <div class="vfd-display-well">
+            <div class="vfd-text" id="circuitVfdReadout">
+              STEP 1: CLICK SLOTS 1, 2 &amp; 3 ON THE CIRCUIT BOARD TO ASSEMBLE COMPONENTS...
+            </div>
+          </div>
+
+          <!-- Material Selection Tray (Replace the Broken Wire) -->
+          <div class="materials-tray-housing">
+            <div class="tray-header">
+              <span>SELECT A TEST MATERIAL TO REPLACE THE BROKEN WIRE IN SLOT 4:</span>
+              <span class="tray-sub">WHICH MATERIAL CONDUCTS ELECTRICITY TO LIGHT THE BULB?</span>
+            </div>
+            <div class="materials-tray-grid" id="circuitMaterialsGrid">
+              <!-- Populated dynamically with the 8 test materials (Wood, Copper, Rubber, Iron Nail, Plastic, Aluminum Foil, Glass, Brass Key) -->
+            </div>
+          </div>
+
+          <!-- Master Circuit Breaker Switch -->
+          <div class="actuator-housing">
+            <button class="actuator-btn" id="testCircuitBreakerBtn" type="button">
+              <span class="actuator-label">⚡ ENGAGE BREAKER SWITCH &amp; TEST CIRCUIT</span>
+            </button>
+          </div>
+        </div>
+
       </section>
 
     </main>
@@ -335,7 +475,7 @@
         <div class="device-station-pills" id="deviceStationSelector">
           <button class="st-pill active" data-st="1" type="button">STATION 01 (SYMBOLS)</button>
           <button class="st-pill" data-st="2" type="button">STATION 02 (REACTOR)</button>
-          <button class="st-pill" data-st="3" type="button">STATION 03 (COMMS)</button>
+          <button class="st-pill" data-st="3" type="button">STATION 03 (CIRCUIT LAB)</button>
           <button class="st-pill" data-st="4" type="button">STATION 04 (CRYO)</button>
           <button class="st-pill" data-st="5" type="button">STATION 05 (EXIT DOOR)</button>
         </div>
@@ -398,7 +538,7 @@
         <!-- TAB 3: BACKEND SETTINGS FOR SELECTED STATION -->
         <div class="btab-panel" id="tab-settings">
           <div class="settings-grid">
-            <!-- Left Settings Card: Station 1 Symbol Values OR Stations 2-5 Passcode & Clue Editor -->
+            <!-- Card A: Station 1 Symbol Values -->
             <div class="settings-card" id="st1SymbolsCard">
               <h3>STATION 01: SYMBOL NUMERICAL VALUES (0–9)</h3>
               <p class="settings-hint">Changing these values automatically updates all 6 equations and the 6-digit door unlock code:</p>
@@ -426,6 +566,7 @@
               </div>
             </div>
 
+            <!-- Card B: Stations 2, 4, 5 Passcode & Clue Editor -->
             <div class="settings-card hidden" id="stGenericCodeCard">
               <h3 id="genCfgHeader">STATION PASSCODE &amp; CLUE CONFIG</h3>
               <p class="settings-hint">Customize the target unlock code and printable clue card for this station:</p>
@@ -442,6 +583,24 @@
                   <span>Printable Room Clue Text / Equation</span>
                   <input type="text" id="cfgStationClue" />
                 </label>
+              </div>
+            </div>
+
+            <!-- Card C: Station 03 Circuit Materials Info -->
+            <div class="settings-card hidden" id="st3CircuitConfigCard">
+              <h3>STATION 03: CIRCUIT &amp; CONDUCTOR MATERIALS</h3>
+              <p class="settings-hint">
+                Players must assemble the 12V Battery + Copper Wire + Light Bulb, then pick a conductive material to bridge the broken wire and light up the bulb:
+              </p>
+              <div class="st3-materials-summary">
+                <div class="st3-group">
+                  <strong>✅ CONDUCTORS (LIGHT THE BULB &amp; UNLOCK DOOR):</strong>
+                  <p>🪙 Copper Wire/Coin, 🔩 Iron/Steel Nail, ✨ Aluminum Foil Strip, 🔑 Brass/Metal Key</p>
+                </div>
+                <div class="st3-group">
+                  <strong>❌ INSULATORS (BLOCK CURRENT):</strong>
+                  <p>🪵 Dry Wooden Stick, 🛞 Rubber Eraser Strip, 📏 Plastic Ruler, 🧪 Glass Test Rod</p>
+                </div>
               </div>
             </div>
 

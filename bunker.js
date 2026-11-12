@@ -2,7 +2,18 @@
 // G11-SCB // BUNKER CONTROL TERMINAL MK-IV (MULTI-DEVICE / SINGLE-SCREEN CLIENT)
 // ============================================================================
 
-const DEVICE_STATION_STORAGE_KEY = 'g11scb_assigned_device_station_v2';
+const DEVICE_STATION_STORAGE_KEY = 'g11scb_assigned_device_station_v3';
+
+const DEFAULT_CIRCUIT_MATERIALS = [
+  { id: 'wood', name: 'DRY WOODEN STICK', icon: '🪵', isConductor: false, resistance: '∞ Ω', reason: 'Wood is an electrical insulator — electrons cannot flow through it.' },
+  { id: 'copper', name: 'COPPER WIRE / COIN', icon: '🪙', isConductor: true, resistance: '0.02 Ω', reason: 'Copper is an excellent metallic conductor! Current flows to light the bulb.' },
+  { id: 'rubber', name: 'RUBBER ERASER STRIP', icon: '🛞', isConductor: false, resistance: '∞ Ω', reason: 'Rubber is a high-resistance insulator used to block electricity.' },
+  { id: 'nail', name: 'IRON / STEEL NAIL', icon: '🔩', isConductor: true, resistance: '0.09 Ω', reason: 'Iron/Steel is a conductive metal that bridges the broken wire gap!' },
+  { id: 'plastic', name: 'PLASTIC RULER', icon: '📏', isConductor: false, resistance: '∞ Ω', reason: 'Plastic is a polymer insulator — circuit remains open.' },
+  { id: 'foil', name: 'ALUMINUM FOIL STRIP', icon: '✨', isConductor: true, resistance: '0.04 Ω', reason: 'Aluminum is a lightweight metal conductor that completes the circuit!' },
+  { id: 'glass', name: 'GLASS TEST ROD', icon: '🧪', isConductor: false, resistance: '∞ Ω', reason: 'Glass is a dielectric insulator — zero current flow.' },
+  { id: 'key', name: 'BRASS / METAL KEY', icon: '🔑', isConductor: true, resistance: '0.06 Ω', reason: 'Brass/Metal alloy conducts electricity and ignites the emergency bulb!' }
+];
 
 // Fallback Backend Data if offline
 let backendData = {
@@ -85,31 +96,47 @@ let backendData = {
     },
     3: {
       id: 3,
-      type: 'code-lock',
-      serial: 'UNIT: G11-SCB // SEC-03 // MK-IV',
-      title: 'STATION 03: BUNKER COMMS DECODER',
-      code: '3115',
+      type: 'circuit-lab',
+      serial: 'UNIT: G11-SCB // SEC-03 // CIRCUIT-MK-IV',
+      title: 'STATION 03: EMERGENCY CIRCUIT & CONDUCTOR LAB',
+      code: 'CONDUCTOR',
       sequenceSlots: [
-        { slot: 1, glyph: '📡', value: '3' },
-        { slot: 2, glyph: '📻', value: '1' },
-        { slot: 3, glyph: '🛰️', value: '1' },
-        { slot: 4, glyph: '📡', value: '5' }
+        { slot: 1, glyph: '🔋', value: '12V' },
+        { slot: 2, glyph: '⚡', value: 'WIRE' },
+        { slot: 3, glyph: '🪙', value: 'METAL' },
+        { slot: 4, glyph: '💡', value: 'LIT' }
       ],
       crtLines: [
-        '[SYS] SECTOR GAMMA COMMUNICATIONS ARRAY LOCKED.',
-        '[DIR] DECODE THE INTERCEPTED BUNKER TRANSMISSION AT STATION 03.',
-        '[DIR] EXTRACT THE NUMERICAL CIPHER KEY.',
-        '[REQ] INPUT CIPHER KEY TO RESTORE COMMS.'
+        '[SYS] EMERGENCY CORRIDOR LIGHT BULB OFFLINE — WIRE SEVERED.',
+        '[DIR] STEP 1: ASSEMBLE THE SIMPLE CIRCUIT (BATTERY + WIRES + BULB).',
+        '[DIR] STEP 2: SELECT A CONDUCTIVE MATERIAL TO REPLACE THE BROKEN WIRE.',
+        '[REQ] STEP 3: ENGAGE BREAKER TO LIGHT UP THE BULB & REVEAL THE DOOR!'
       ],
       showScratchpad: false,
-      victoryTitle: 'ACCESS GRANTED',
-      victorySubtitle: 'STATION 03 COMPLETE — PROCEED IMMEDIATELY TO STATION 04',
+      victoryTitle: 'ACCESS GRANTED // CIRCUIT ENERGIZED',
+      victorySubtitle: 'EMERGENCY BULB LIT — HIDDEN DOOR UNLOCKED! PROCEED TO STATION 04',
+      circuitMaterials: DEFAULT_CIRCUIT_MATERIALS,
       clues: [
-        { title: 'STATION 03 CLUE #1', formula: 'COMMS CIPHER: 3115', note: 'Customize this clue in Backend Settings once Challenge 3 is finalized.' }
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #1',
+          formula: '🔋 + ➖ + 💡 + [METAL] = 💡✨',
+          note: 'To complete a simple circuit, connect a Power Source (Battery), Conductive Path (Wires), and Load (Light Bulb) in a closed loop.'
+        },
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #2',
+          formula: 'CONDUCTORS: 🪙 🔩 ✨ 🔑',
+          note: 'Metals (Copper, Iron, Aluminum, Brass) have free electrons that allow electrical current to replace a broken wire.'
+        },
+        {
+          title: 'STATION 03 // FIELD MANUAL CLUE #3',
+          formula: 'INSULATORS: 🪵 🛞 📏 🧪',
+          note: 'Wood, Rubber, Plastic, and Glass block electrical current and will NOT light the bulb.'
+        }
       ],
       materials: [
-        { item: 'Device #3 (Laptop/Tablet) locked to Station 03', detail: 'Open /#station-3 in Fullscreen mode at Station 03.', category: 'HARDWARE' },
-        { item: 'Station 03 Physical Clues / Props', detail: 'Customizable in the Backend Settings tab as soon as Challenge 3 is ready.', category: 'PROPS' }
+        { item: 'Device #3 (Laptop/Tablet) locked to Station 03', detail: 'Open /#station-3 in Fullscreen mode to run the Interactive Circuit & Material Lab.', category: 'HARDWARE' },
+        { item: '3 Printable Circuit & Conductor Clue Cards', detail: 'Print from the Backend Clues Tab and hide around Station 03.', category: 'PRINTABLE PROPS' },
+        { item: 'Optional Real-Life Demo Props (Battery, Bulb, Alligator Clips, Test Objects)', detail: 'Optional physical props next to the tablet: Copper coin, iron nail, aluminum foil, wooden stick, rubber eraser, plastic ruler.', category: 'SCIENCE PROPS' }
       ],
       stats: { attempts: 0, solves: 0 }
     },
@@ -177,18 +204,25 @@ let backendData = {
 };
 
 let state = {
-  stationId: 1, // Which of the 5 challenges this device is currently assigned to
+  stationId: 1,
   slots: ['', '', '', '', '', ''],
   activeSlot: 0,
   unlocked: false,
-  sfxEnabled: true
+  sfxEnabled: true,
+  // Station 03 Simple Circuit Lab State
+  circuit: {
+    batteryInstalled: false,
+    wireInstalled: false,
+    bulbInstalled: false,
+    selectedMaterialId: null,
+    energized: false
+  }
 };
 
 function getCurrentStationConfig() {
   return backendData.stations[state.stationId] || backendData.stations[1];
 }
 
-// Determine initial station from URL (#station-2 or ?station=2) or localStorage
 function detectInitialDeviceStation() {
   const hashMatch = window.location.hash.match(/station-(\d)/i);
   if (hashMatch) {
@@ -212,6 +246,13 @@ function assignDeviceToStation(stationNum) {
   state.stationId = stId;
   state.unlocked = false;
   state.activeSlot = 0;
+  state.circuit = {
+    batteryInstalled: false,
+    wireInstalled: false,
+    bulbInstalled: false,
+    selectedMaterialId: null,
+    energized: false
+  };
 
   try {
     localStorage.setItem(DEVICE_STATION_STORAGE_KEY, String(stId));
@@ -290,6 +331,26 @@ function playControlClick() {
   gain.connect(ctx.destination);
   osc.start(now);
   osc.stop(now + 0.065);
+}
+
+function playComponentSnapSound() {
+  if (!state.sfxEnabled) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  [320, 580].forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now + idx * 0.055);
+    gain.gain.setValueAtTime(0.16, now + idx * 0.055);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now + idx * 0.055);
+    osc.stop(now + idx * 0.055 + 0.09);
+  });
 }
 
 function playAlarmBuzzer() {
@@ -374,6 +435,7 @@ async function fetchBackendConfig() {
 function applyStationToUI() {
   const stId = state.stationId;
   const stCfg = getCurrentStationConfig();
+  const isCircuitStation = stCfg.type === 'circuit-lab';
 
   // 1. Hardware Header & CRT Labels
   document.getElementById('stationSerialText').textContent =
@@ -395,45 +457,58 @@ function applyStationToUI() {
       .join('');
   }
 
-  // 3. Scratchpad Visibility
+  // 3. Toggle between Keypad Mode vs. Circuit Lab Mode
   const scratchMod = document.getElementById('scratchpadModule');
-  if (scratchMod) {
+  const circuitTelMod = document.getElementById('circuitTelemetryModule');
+  const lockMod = document.getElementById('lockModule');
+  const circuitLabMod = document.getElementById('circuitLabModule');
+
+  if (isCircuitStation) {
+    scratchMod.style.display = 'none';
+    circuitTelMod.classList.remove('hidden');
+    lockMod.classList.add('hidden');
+    circuitLabMod.classList.remove('hidden');
+    renderCircuitMaterialsTray(stCfg.circuitMaterials || DEFAULT_CIRCUIT_MATERIALS);
+    renderCircuitLabState();
+  } else {
+    circuitTelMod.classList.add('hidden');
+    circuitLabMod.classList.add('hidden');
+    lockMod.classList.remove('hidden');
     scratchMod.style.display = stCfg.showScratchpad ? 'block' : 'none';
-  }
 
-  // 4. Sequence Cells Grid (Dynamic slot count)
-  const seqGrid = document.getElementById('sequenceGrid');
-  const slotsArr = stCfg.sequenceSlots || [];
-  document.getElementById('sequenceHousingLabel').textContent =
-    `REQUIRED STATION 0${stId} UNLOCK SEQUENCE (${slotsArr.length} DIGITS)`;
+    // 4. Sequence Cells Grid (Dynamic slot count)
+    const seqGrid = document.getElementById('sequenceGrid');
+    const slotsArr = stCfg.sequenceSlots || [];
+    document.getElementById('sequenceHousingLabel').textContent =
+      `REQUIRED STATION 0${stId} UNLOCK SEQUENCE (${slotsArr.length} DIGITS)`;
 
-  seqGrid.style.gridTemplateColumns = `repeat(${Math.min(slotsArr.length, 6)}, 1fr)`;
-  seqGrid.innerHTML = slotsArr
-    .map(
-      (s, idx) => `
-      <div class="seq-cell ${idx === state.activeSlot ? 'active' : ''}" data-slot="${idx}">
-        <div class="cell-header">
-          <span class="cell-pos">CH-0${idx + 1}</span>
-          <span class="cell-led"></span>
+    seqGrid.style.gridTemplateColumns = `repeat(${Math.min(slotsArr.length, 6)}, 1fr)`;
+    seqGrid.innerHTML = slotsArr
+      .map(
+        (s, idx) => `
+        <div class="seq-cell ${idx === state.activeSlot ? 'active' : ''}" data-slot="${idx}">
+          <div class="cell-header">
+            <span class="cell-pos">CH-0${idx + 1}</span>
+            <span class="cell-led"></span>
+          </div>
+          <div class="cell-symbol-window">
+            <span class="hazard-glyph">${s.glyph}</span>
+          </div>
+          <div class="cell-seven-seg" id="digit-slot-${idx}">${state.slots[idx] !== '' ? state.slots[idx] : '-'}</div>
         </div>
-        <div class="cell-symbol-window">
-          <span class="hazard-glyph">${s.glyph}</span>
-        </div>
-        <div class="cell-seven-seg" id="digit-slot-${idx}">${state.slots[idx] !== '' ? state.slots[idx] : '-'}</div>
-      </div>
-    `
-    )
-    .join('');
+      `
+      )
+      .join('');
 
-  // Re-bind click listeners on the newly rendered sequence cells
-  seqGrid.querySelectorAll('.seq-cell').forEach((cell) => {
-    cell.addEventListener('click', () => {
-      if (state.unlocked) return;
-      playControlClick();
-      state.activeSlot = parseInt(cell.dataset.slot, 10);
-      renderConsole();
+    seqGrid.querySelectorAll('.seq-cell').forEach((cell) => {
+      cell.addEventListener('click', () => {
+        if (state.unlocked) return;
+        playControlClick();
+        state.activeSlot = parseInt(cell.dataset.slot, 10);
+        renderConsole();
+      });
     });
-  });
+  }
 
   // 5. Full-Screen Green Takeover Texts & Verified Badges
   document.getElementById('greenStatusPill').textContent =
@@ -444,6 +519,7 @@ function applyStationToUI() {
     stCfg.victorySubtitle || 'BLAST DOOR UNSEALED';
 
   const verifiedRow = document.getElementById('greenVerifiedRow');
+  const slotsArr = stCfg.sequenceSlots || [];
   if (verifiedRow) {
     verifiedRow.innerHTML = slotsArr
       .map(
@@ -461,8 +537,245 @@ function applyStationToUI() {
   populateBackendPortalForStation(stId, stCfg);
 }
 
+// ============================================================================
+// STATION 03: INTERACTIVE SIMPLE CIRCUIT & CONDUCTOR MATERIAL LAB
+// ============================================================================
+function renderCircuitMaterialsTray(materialsList) {
+  const grid = document.getElementById('circuitMaterialsGrid');
+  if (!grid) return;
+
+  grid.innerHTML = materialsList
+    .map(
+      (mat) => `
+      <button class="mat-test-btn ${state.circuit.selectedMaterialId === mat.id ? 'selected-mat' : ''}" data-mat="${mat.id}" type="button">
+        <span class="mat-icon">${mat.icon}</span>
+        <span class="mat-name">${mat.name}</span>
+      </button>
+    `
+    )
+    .join('');
+
+  grid.querySelectorAll('.mat-test-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (state.unlocked) return;
+      playComponentSnapSound();
+      state.circuit.selectedMaterialId = btn.dataset.mat;
+      state.circuit.energized = false;
+
+      const mats = getCurrentStationConfig().circuitMaterials || DEFAULT_CIRCUIT_MATERIALS;
+      const chosen = mats.find((m) => m.id === state.circuit.selectedMaterialId);
+      if (chosen) {
+        const vfd = document.getElementById('circuitVfdReadout');
+        vfd.className = 'vfd-text';
+        vfd.textContent = `CLAMPED [${chosen.name}] INTO ALLIGATOR CLIPS — CLICK ENGAGE BREAKER TO TEST!`;
+        appendCrtLog('MAT', `CLAMPED TEST MATERIAL: ${chosen.icon} ${chosen.name}`);
+      }
+      renderCircuitMaterialsTray(mats);
+      renderCircuitLabState();
+    });
+  });
+}
+
+function renderCircuitLabState() {
+  const c = state.circuit;
+  const mats = getCurrentStationConfig().circuitMaterials || DEFAULT_CIRCUIT_MATERIALS;
+  const chosenMat = mats.find((m) => m.id === c.selectedMaterialId) || null;
+
+  // 1. Node 1: 12V Battery
+  const batBtn = document.getElementById('nodeBatteryBtn');
+  const batVis = document.getElementById('nodeBatteryVisual');
+  const batTag = document.getElementById('nodeBatteryTag');
+  batBtn.classList.toggle('installed', c.batteryInstalled);
+  batVis.textContent = c.batteryInstalled ? '🔋 12V BUNKER CELL MOUNTED' : '🔋 CLICK TO MOUNT 12V BATTERY';
+  batTag.textContent = c.batteryInstalled ? '12.0 V READY' : 'EMPTY SOCKET';
+
+  // 2. Node 2: Copper Wire Lead
+  const wireBtn = document.getElementById('nodeWireBtn');
+  const wireVis = document.getElementById('nodeWireVisual');
+  const wireTag = document.getElementById('nodeWireTag');
+  wireBtn.classList.toggle('installed', c.wireInstalled);
+  wireVis.textContent = c.wireInstalled ? '⚡ COPPER BUS WIRE CONNECTED' : '➕ CLICK TO CONNECT COPPER WIRE';
+  wireTag.textContent = c.wireInstalled ? 'CONNECTED' : 'DISCONNECTED';
+
+  // 3. Node 3: Emergency Light Bulb
+  const bulbBtn = document.getElementById('nodeBulbBtn');
+  const bulbVis = document.getElementById('nodeBulbVisual');
+  const bulbTag = document.getElementById('nodeBulbTag');
+  bulbBtn.classList.toggle('installed', c.bulbInstalled);
+  bulbVis.textContent = c.bulbInstalled ? '💡 TUNGSTEN BULB SCREWED IN' : '💡 CLICK TO SCREW IN LIGHT BULB';
+  bulbTag.textContent = c.bulbInstalled ? 'MOUNTED' : 'UNINSTALLED';
+
+  // 4. Node 4: Clamped Material Display
+  const gapBox = document.getElementById('nodeGapBox');
+  const clampedDisp = document.getElementById('clampedMaterialDisplay');
+  if (chosenMat) {
+    gapBox.classList.add('installed');
+    clampedDisp.innerHTML = `${chosenMat.icon} <strong>${chosenMat.name}</strong> CLAMPED IN GAP`;
+  } else {
+    gapBox.classList.remove('installed');
+    clampedDisp.textContent = '⚠️ WIRE SEVERED — SELECT A MATERIAL BELOW';
+  }
+
+  // 5. Center Bulb Dome & Traces
+  const bulbDome = document.getElementById('bulbDome');
+  const beaconCap = document.getElementById('beaconCaption');
+  const electronTrace = document.getElementById('electronTrace');
+  const baseTrace = document.querySelector('.trace-base');
+
+  const hardwareReady = c.batteryInstalled && c.wireInstalled && c.bulbInstalled;
+  if (baseTrace) {
+    baseTrace.classList.toggle('assembled-trace', hardwareReady);
+  }
+
+  if (c.energized && chosenMat && chosenMat.isConductor) {
+    bulbDome.className = 'bulb-dome bulb-lit';
+    beaconCap.className = 'beacon-caption lit-caption';
+    beaconCap.textContent = '✨ BULB IGNITED — DOOR LOCATED! ✨';
+    electronTrace.classList.add('flowing');
+  } else {
+    electronTrace.classList.remove('flowing');
+    beaconCap.className = 'beacon-caption';
+    if (c.bulbInstalled) {
+      bulbDome.className = 'bulb-dome bulb-ready';
+      beaconCap.textContent = 'BULB MOUNTED — AWAITING CLOSED CONDUCTIVE LOOP';
+    } else {
+      bulbDome.className = 'bulb-dome';
+      beaconCap.textContent = 'BULB OFFLINE — DARK CORRIDOR';
+    }
+  }
+
+  // 6. Left Bay Multimeter & Checklist
+  document.getElementById('cstep-battery').classList.toggle('done', c.batteryInstalled);
+  document.getElementById('cstep-wire').classList.toggle('done', c.wireInstalled);
+  document.getElementById('cstep-bulb').classList.toggle('done', c.bulbInstalled);
+  document.getElementById('cstep-material').classList.toggle('done', !!(chosenMat && chosenMat.isConductor && c.energized));
+
+  const mVolt = document.getElementById('meterVoltage');
+  const mCurr = document.getElementById('meterCurrent');
+  const mRes = document.getElementById('meterResistance');
+  const mLum = document.getElementById('meterLumens');
+
+  mVolt.textContent = c.batteryInstalled ? '12.0 V' : '0.0 V';
+  mRes.textContent = chosenMat ? chosenMat.resistance : '--- Ω';
+
+  if (c.energized && chosenMat && chosenMat.isConductor) {
+    mCurr.textContent = '2.40 A';
+    mCurr.classList.add('energized');
+    mLum.textContent = '1200 LM';
+    mLum.classList.add('energized');
+  } else {
+    mCurr.textContent = '0.00 A';
+    mCurr.classList.remove('energized');
+    mLum.textContent = '0 LM';
+    mLum.classList.remove('energized');
+  }
+}
+
+async function testCircuitBreaker() {
+  if (state.unlocked) return;
+
+  const c = state.circuit;
+  const vfd = document.getElementById('circuitVfdReadout');
+  const labMod = document.getElementById('circuitLabModule');
+  const mats = getCurrentStationConfig().circuitMaterials || DEFAULT_CIRCUIT_MATERIALS;
+  const chosenMat = mats.find((m) => m.id === c.selectedMaterialId) || null;
+
+  // Check if all 3 circuit components are assembled first
+  if (!c.batteryInstalled || !c.wireInstalled || !c.bulbInstalled) {
+    playAlarmBuzzer();
+    const missing = [];
+    if (!c.batteryInstalled) missing.push('SLOT 1 (12V BATTERY)');
+    if (!c.wireInstalled) missing.push('SLOT 2 (COPPER WIRE)');
+    if (!c.bulbInstalled) missing.push('SLOT 3 (LIGHT BULB)');
+
+    vfd.className = 'vfd-text vfd-error';
+    vfd.textContent = `⚠️ CIRCUIT INCOMPLETE! CLICK TO INSTALL: ${missing.join(', ')}`;
+    appendCrtLog('ERR', `MISSING CIRCUIT PARTS: ${missing.join(', ')}`);
+    triggerConsoleShake(labMod);
+    return;
+  }
+
+  // Check if a material is clamped into Slot 4
+  if (!chosenMat) {
+    playAlarmBuzzer();
+    vfd.className = 'vfd-text vfd-error';
+    vfd.textContent = '⚠️ WIRE GAP OPEN! SELECT A MATERIAL BELOW TO REPLACE THE BROKEN WIRE';
+    appendCrtLog('ERR', 'NO MATERIAL CLAMPED IN BROKEN WIRE GAP.');
+    triggerConsoleShake(labMod);
+    return;
+  }
+
+  // Test conductivity via Backend API
+  try {
+    await fetch('/api/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        stationId: 3,
+        circuitComplete: !!chosenMat.isConductor
+      })
+    });
+  } catch (e) {}
+
+  if (chosenMat.isConductor) {
+    // Success! Energize circuit, light up the bulb on screen, then trigger Full-Screen Green!
+    c.energized = true;
+    renderCircuitLabState();
+    playAirlockUnlockSound();
+
+    vfd.className = 'vfd-text';
+    vfd.style.color = '#34d399';
+    vfd.textContent = `✅ ${chosenMat.reason.toUpperCase()} — BULB IGNITED!`;
+    appendCrtLog('PASS', `${chosenMat.name} CONDUCTS CURRENT! BULB LIT!`, true);
+
+    const chip = document.getElementById('circuitStatusChip');
+    chip.textContent = '💡 CIRCUIT ENERGIZED // BULB LIT';
+    chip.className = 'security-chip unlocked';
+
+    // Let players admire the glowing bulb and flowing electrons for 1.6s before full-screen green takeover
+    setTimeout(() => {
+      state.unlocked = true;
+      renderConsole();
+    }, 1600);
+  } else {
+    // Insulator chosen! Explain why the bulb didn't light up
+    c.energized = false;
+    renderCircuitLabState();
+    playAlarmBuzzer();
+    vfd.className = 'vfd-text vfd-error';
+    vfd.textContent = `❌ BULB DID NOT LIGHT: ${chosenMat.reason.toUpperCase()}`;
+    appendCrtLog('FAIL', `${chosenMat.name} IS AN INSULATOR (0.00 A).`);
+    triggerConsoleShake(labMod);
+  }
+}
+
+function resetCircuitLab() {
+  playControlClick();
+  state.circuit = {
+    batteryInstalled: false,
+    wireInstalled: false,
+    bulbInstalled: false,
+    selectedMaterialId: null,
+    energized: false
+  };
+  const vfd = document.getElementById('circuitVfdReadout');
+  vfd.className = 'vfd-text';
+  vfd.style.color = '';
+  vfd.textContent = 'STEP 1: CLICK SLOTS 1, 2 & 3 ON THE CIRCUIT BOARD TO ASSEMBLE COMPONENTS...';
+
+  const chip = document.getElementById('circuitStatusChip');
+  chip.textContent = '⚡ CIRCUIT DE-ENERGIZED';
+  chip.className = 'security-chip locked';
+
+  const mats = getCurrentStationConfig().circuitMaterials || DEFAULT_CIRCUIT_MATERIALS;
+  renderCircuitMaterialsTray(mats);
+  renderCircuitLabState();
+}
+
+// ============================================================================
+// BACKEND PORTAL POPULATION
+// ============================================================================
 function populateBackendPortalForStation(stId, stCfg) {
-  // Highlight active device station pill
   document.querySelectorAll('#deviceStationSelector .st-pill').forEach((pill) => {
     pill.classList.toggle('active', parseInt(pill.dataset.st, 10) === stId);
   });
@@ -500,8 +813,9 @@ function populateBackendPortalForStation(stId, stCfg) {
   }
 
   // Tab 2: Master Answer Key & Materials Checklist
-  document.getElementById('akStationLabel').textContent = `STATION 0${stId} MASTER UNLOCK CODE`;
-  document.getElementById('backendMasterCode').textContent = stCfg.code;
+  document.getElementById('akStationLabel').textContent = `STATION 0${stId} SOLUTION / KEY`;
+  document.getElementById('backendMasterCode').textContent =
+    stCfg.type === 'circuit-lab' ? 'BATTERY + WIRE + BULB + METAL' : stCfg.code;
   document.getElementById('backendDirectLink').textContent = `${window.location.origin}/#station-${stId}`;
   const stats = stCfg.stats || { attempts: 0, solves: 0 };
   document.getElementById('backendStatsSummary').textContent =
@@ -529,18 +843,23 @@ function populateBackendPortalForStation(stId, stCfg) {
   // Tab 3: Station Configurator
   const st1Card = document.getElementById('st1SymbolsCard');
   const genCard = document.getElementById('stGenericCodeCard');
+  const st3Card = document.getElementById('st3CircuitConfigCard');
+
+  st1Card.classList.add('hidden');
+  genCard.classList.add('hidden');
+  st3Card.classList.add('hidden');
 
   if (stId === 1) {
     st1Card.classList.remove('hidden');
-    genCard.classList.add('hidden');
     if (backendData.station1Symbols) {
       Object.keys(backendData.station1Symbols).forEach((k) => {
         const inp = document.getElementById(`cfg-sym-${k}`);
         if (inp) inp.value = backendData.station1Symbols[k].value;
       });
     }
+  } else if (stId === 3) {
+    st3Card.classList.remove('hidden');
   } else {
-    st1Card.classList.add('hidden');
     genCard.classList.remove('hidden');
     document.getElementById('genCfgHeader').textContent = `STATION 0${stId}: PASSCODE & CLUE CONFIG`;
     document.getElementById('cfgStationTitle').value = stCfg.title || '';
@@ -600,7 +919,6 @@ function renderConsole() {
 function handleInputKey(key) {
   if (state.unlocked) return;
 
-  const stCfg = getCurrentStationConfig();
   const maxSlots = state.slots.length;
   const vfd = document.getElementById('vfdReadout');
   vfd.className = 'vfd-text';
@@ -710,9 +1028,13 @@ function resetAirlockSystem() {
   state.slots = Array(maxSlots).fill('');
   state.activeSlot = 0;
 
-  const vfd = document.getElementById('vfdReadout');
-  vfd.textContent = 'AWAITING OVERRIDE SEQUENCE...';
-  vfd.className = 'vfd-text';
+  if (getCurrentStationConfig().type === 'circuit-lab') {
+    resetCircuitLab();
+  } else {
+    const vfd = document.getElementById('vfdReadout');
+    vfd.textContent = 'AWAITING OVERRIDE SEQUENCE...';
+    vfd.className = 'vfd-text';
+  }
 
   renderConsole();
 }
@@ -749,6 +1071,37 @@ document.addEventListener('DOMContentLoaded', () => {
       assignDeviceToStation(targetSt);
     });
   });
+
+  // Station 03 Interactive Circuit Nodes (Slots 1, 2, 3)
+  document.getElementById('nodeBatteryBtn').addEventListener('click', () => {
+    if (state.unlocked) return;
+    playComponentSnapSound();
+    state.circuit.batteryInstalled = !state.circuit.batteryInstalled;
+    state.circuit.energized = false;
+    appendCrtLog('CIR', state.circuit.batteryInstalled ? '12V BATTERY CELL INSTALLED.' : '12V BATTERY REMOVED.');
+    renderCircuitLabState();
+  });
+
+  document.getElementById('nodeWireBtn').addEventListener('click', () => {
+    if (state.unlocked) return;
+    playComponentSnapSound();
+    state.circuit.wireInstalled = !state.circuit.wireInstalled;
+    state.circuit.energized = false;
+    appendCrtLog('CIR', state.circuit.wireInstalled ? 'COPPER BUS WIRE CONNECTED.' : 'COPPER BUS WIRE DISCONNECTED.');
+    renderCircuitLabState();
+  });
+
+  document.getElementById('nodeBulbBtn').addEventListener('click', () => {
+    if (state.unlocked) return;
+    playComponentSnapSound();
+    state.circuit.bulbInstalled = !state.circuit.bulbInstalled;
+    state.circuit.energized = false;
+    appendCrtLog('CIR', state.circuit.bulbInstalled ? 'EMERGENCY FILAMENT BULB MOUNTED.' : 'BULB UNINSTALLED.');
+    renderCircuitLabState();
+  });
+
+  document.getElementById('testCircuitBreakerBtn').addEventListener('click', testCircuitBreaker);
+  document.getElementById('resetCircuitBtn').addEventListener('click', resetCircuitLab);
 
   // Mechanical Keypad Clicks
   document.querySelectorAll('#mechKeypad .mech-key').forEach((btn) => {
@@ -836,7 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         biohazard: parseInt(document.getElementById('cfg-sym-biohazard').value, 10),
         snowflake: parseInt(document.getElementById('cfg-sym-snowflake').value, 10)
       };
-    } else {
+    } else if (stId !== 3) {
       payload.title = document.getElementById('cfgStationTitle').value.trim();
       payload.code = document.getElementById('cfgStationCode').value.trim();
       payload.clueFormula = document.getElementById('cfgStationClue').value.trim();
@@ -854,7 +1207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playAirlockUnlockSound();
         const stCfg = getCurrentStationConfig();
         const fb = document.getElementById('backendSaveFeedback');
-        fb.textContent = `✅ Station 0${stId} saved! Master Code: ${stCfg.code}`;
+        fb.textContent = `✅ Station 0${stId} settings saved!`;
         setTimeout(() => (fb.textContent = ''), 4000);
       }
     } catch (err) {
@@ -910,6 +1263,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!backendModal.classList.contains('hidden')) {
       if (e.key === 'Escape') backendModal.classList.add('hidden');
+      return;
+    }
+
+    if (getCurrentStationConfig().type === 'circuit-lab') {
+      if (e.key === 'Enter') {
+        testCircuitBreaker();
+      } else if (e.key === 'Escape') {
+        resetCircuitLab();
+      }
       return;
     }
 
