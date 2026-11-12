@@ -1,0 +1,10 @@
+{
+  "name": "g11scb-bunker-escape-room",
+  "version": "1.0.0",
+  "private": true,
+  "description": "G11 SCB Bunker Escape Room - 5-Station Digital Control Panel",
+  "scripts": {
+    "start": "npx serve . -l 3000",
+    "dev": "npx serve . -l 3000"
+  }
+}

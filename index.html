@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>G11 SCB // BUNKER CONTROL TERMINAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <div class="hazard-border top-hazard"></div>
+
+  <!-- Top Bunker Terminal Header -->
+  <header class="bunker-header">
+    <div class="brand-block">
+      <div class="status-beacon" id="globalBeacon"></div>
+      <div>
+        <div class="brand-sub">SECTOR G11-SCB // UNDERGROUND CONTAINMENT</div>
+        <h1 class="brand-title">BUNKER CONTROL PANEL <span class="version-tag">SYS.v2.5</span></h1>
+      </div>
+    </div>
+
+    <!-- Station Navigation Bar (Hidden when Kiosk Lock is active) -->
+    <nav class="station-nav" id="stationNav" aria-label="Bunker Stations">
+      <button class="nav-btn active" data-target="hub">
+        <span class="nav-code">ALL</span>
+        <span class="nav-label">CONTROL HUB</span>
+      </button>
+      <button class="nav-btn" data-target="station-1">
+        <span class="nav-code">ST-01</span>
+        <span class="nav-label">SYMBOL LOCK</span>
+      </button>
+      <button class="nav-btn" data-target="station-2">
+        <span class="nav-code">ST-02</span>
+        <span class="nav-label">CHALLENGE 2</span>
+      </button>
+      <button class="nav-btn" data-target="station-3">
+        <span class="nav-code">ST-03</span>
+        <span class="nav-label">CHALLENGE 3</span>
+      </button>
+      <button class="nav-btn" data-target="station-4">
+        <span class="nav-code">ST-04</span>
+        <span class="nav-label">CHALLENGE 4</span>
+      </button>
+      <button class="nav-btn" data-target="station-5">
+        <span class="nav-code">ST-05</span>
+        <span class="nav-label">CHALLENGE 5</span>
+      </button>
+    </nav>
+
+    <div class="utility-controls">
+      <button class="util-btn" id="sfxToggleBtn" title="Toggle Terminal Sound Effects">
+        🔊 SFX: ON
+      </button>
+      <button class="util-btn" id="kioskLockBtn" title="Lock device to current station (hides top station switcher for players)">
+        🔓 STATION UNLOCKED
+      </button>
+      <button class="util-btn" id="fullscreenBtn" title="Toggle Fullscreen">
+        ⛶ FULLSCREEN
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="terminal-main">
+
+    <!-- ==================== VIEW 0: CENTRAL CONTROL HUB ==================== -->
+    <section class="view-section active" id="view-hub">
+      <div class="hub-banner">
+        <div>
+          <span class="badge-pill">MULTI-STATION DEPLOYMENT</span>
+          <h2>SELECT THIS DEVICE'S BUNKER STATION</h2>
+          <p>Open this website at each physical station in the G11 SCB escape room, pick that station's module below, and click <strong>"🔓 Station Unlocked"</strong> in the top-right to lock the screen to that station.</p>
+        </div>
+        <div class="hub-actions">
+          <button class="action-btn secondary" id="openCluesModalBtn">
+            🖨️ ROOM EQUATION CLUES (ST-01)
+          </button>
+          <button class="action-btn danger" id="resetAllBtn">
+            ↺ RESET ALL STATIONS
+          </button>
+        </div>
+      </div>
+
+      <div class="stations-grid" id="hubStationsGrid">
+        <!-- Station 1 Card -->
+        <article class="station-card ready" data-station="1">
+          <div class="card-header">
+            <span class="station-id">STATION 01 // READY</span>
+            <span class="station-status" id="hub-status-1">🔒 LOCKED</span>
+          </div>
+          <h3>SECTOR ALPHA: SYMBOL SEQUENCE LOCK</h3>
+          <p class="station-desc">
+            Players search the bunker for the 6 hidden symbol equations, deduce the numerical value of each hazard symbol, and input the 6-digit door sequence:
+          </p>
+          <div class="mini-sequence-preview">
+            <span>☢️</span><span>⚙️</span><span>🔺</span><span>☣️</span><span>❄️</span><span>☢️</span>
+          </div>
+          <div class="card-footer">
+            <button class="launch-btn" data-launch="station-1">LAUNCH STATION 01 →</button>
+          </div>
+        </article>
+
+        <!-- Station 2 Card -->
+        <article class="station-card placeholder" data-station="2">
+          <div class="card-header">
+            <span class="station-id">STATION 02 // PLACEHOLDER</span>
+            <span class="station-status" id="hub-status-2">🔒 LOCKED</span>
+          </div>
+          <h3 id="hub-title-2">SECTOR BETA: REACTOR OVERRIDE</h3>
+          <p class="station-desc" id="hub-desc-2">
+            Customizable Station 02 module. Includes a working keypad/passcode terminal now—ready to be customized once your group finalizes Challenge 2.
+          </p>
+          <div class="card-footer">
+            <button class="launch-btn" data-launch="station-2">LAUNCH STATION 02 →</button>
+          </div>
+        </article>
+
+        <!-- Station 3 Card -->
+        <article class="station-card placeholder" data-station="3">
+          <div class="card-header">
+            <span class="station-id">STATION 03 // PLACEHOLDER</span>
+            <span class="station-status" id="hub-status-3">🔒 LOCKED</span>
+          </div>
+          <h3 id="hub-title-3">SECTOR GAMMA: COMMS DECODER</h3>
+          <p class="station-desc" id="hub-desc-3">
+            Customizable Station 03 module. Includes a working keypad/passcode terminal now—ready to be customized once your group finalizes Challenge 3.
+          </p>
+          <div class="card-footer">
+            <button class="launch-btn" data-launch="station-3">LAUNCH STATION 03 →</button>
+          </div>
+        </article>
+
+        <!-- Station 4 Card -->
+        <article class="station-card placeholder" data-station="4">
+          <div class="card-header">
+            <span class="station-id">STATION 04 // PLACEHOLDER</span>
+            <span class="station-status" id="hub-status-4">🔒 LOCKED</span>
+          </div>
+          <h3 id="hub-title-4">SECTOR DELTA: CRYO CONTAINMENT</h3>
+          <p class="station-desc" id="hub-desc-4">
+            Customizable Station 04 module. Includes a working keypad/passcode terminal now—ready to be customized once your group finalizes Challenge 4.
+          </p>
+          <div class="card-footer">
+            <button class="launch-btn" data-launch="station-4">LAUNCH STATION 04 →</button>
+          </div>
+        </article>
+
+        <!-- Station 5 Card -->
+        <article class="station-card placeholder" data-station="5">
+          <div class="card-header">
+            <span class="station-id">STATION 05 // PLACEHOLDER</span>
+            <span class="station-status" id="hub-status-5">🔒 LOCKED</span>
+          </div>
+          <h3 id="hub-title-5">SECTOR OMEGA: FINAL BLAST DOOR</h3>
+          <p class="station-desc" id="hub-desc-5">
+            Customizable Station 05 module. Final bunker exit override—ready to be customized once your group finalizes Challenge 5.
+          </p>
+          <div class="card-footer">
+            <button class="launch-btn" data-launch="station-5">LAUNCH STATION 05 →</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 1: STATION 01 (SYMBOL EQUATIONS LOCK) ==================== -->
+    <section class="view-section" id="view-station-1">
+      <div class="station-layout">
+        <!-- Left Column: Mission Briefing & Decoder Scratchpad -->
+        <aside class="station-sidebar">
+          <div class="terminal-panel">
+            <div class="panel-header">
+              <span class="panel-tag">STATION 01 // BRIEFING</span>
+              <span class="live-indicator">● ACTIVE</span>
+            </div>
+            <h2 class="station-main-title">AIRLOCK ALPHA: SYMBOL CIPHER</h2>
+            <p class="mission-text">
+              <strong>DIRECTIVE:</strong> The Airlock Alpha blast door is sealed by a 6-symbol security sequence.
+            </p>
+            <ol class="directive-steps">
+              <li>Locate the <strong>6 symbol equations</strong> hidden around this room.</li>
+              <li>Calculate the numerical value for each hazard symbol.</li>
+              <li>Enter the 6-digit sequence matching the symbol order shown on the lock screen.</li>
+            </ol>
+          </div>
+
+          <!-- Optional Scratchpad for Players to type discovered symbol values -->
+          <div class="terminal-panel scratchpad-panel">
+            <div class="panel-header">
+              <span class="panel-tag">DECODER SCRATCHPAD (OPTIONAL)</span>
+              <button class="text-btn" id="clearScratchpadBtn" type="button">CLEAR NOTES</button>
+            </div>
+            <p class="scratchpad-hint">Record each symbol's value as you find the equations in the room:</p>
+            <div class="scratchpad-grid">
+              <label class="scratch-item">
+                <span class="scratch-sym">☢️</span>
+                <span class="scratch-eq">=</span>
+                <input type="number" min="0" max="99" class="scratch-input" data-sym="radiation" placeholder="?" />
+              </label>
+              <label class="scratch-item">
+                <span class="scratch-sym">⚙️</span>
+                <span class="scratch-eq">=</span>
+                <input type="number" min="0" max="99" class="scratch-input" data-sym="gear" placeholder="?" />
+              </label>
+              <label class="scratch-item">
+                <span class="scratch-sym">🔺</span>
+                <span class="scratch-eq">=</span>
+                <input type="number" min="0" max="99" class="scratch-input" data-sym="triangle" placeholder="?" />
+              </label>
+              <label class="scratch-item">
+                <span class="scratch-sym">☣️</span>
+                <span class="scratch-eq">=</span>
+                <input type="number" min="0" max="99" class="scratch-input" data-sym="biohazard" placeholder="?" />
+              </label>
+              <label class="scratch-item">
+                <span class="scratch-sym">❄️</span>
+                <span class="scratch-eq">=</span>
+                <input type="number" min="0" max="99" class="scratch-input" data-sym="snowflake" placeholder="?" />
+              </label>
+            </div>
+            <button class="apply-scratch-btn" id="applyScratchpadBtn" type="button">
+              ⚡ TRANSFER SCRATCHPAD TO DOOR SEQUENCE
+            </button>
+          </div>
+        </aside>
+
+        <!-- Right Column: The Door Sequence & Tactical Keypad -->
+        <div class="station-console">
+          <div class="terminal-panel console-panel" id="st1ConsolePanel">
+            <div class="panel-header">
+              <span class="panel-tag">BLAST DOOR SEQUENCE TERMINAL</span>
+              <span class="lock-state-badge locked" id="st1LockBadge">🔒 AIRLOCK SEALED</span>
+            </div>
+
+            <!-- The 6-Symbol Sequence Display -->
+            <div class="sequence-Instruction">IDENTIFY THE SEQUENCE FOR THE DOOR:</div>
+            <div class="symbol-sequence-row" id="st1SequenceRow">
+              <div class="seq-slot active" data-slot="0">
+                <div class="seq-index">POS 01</div>
+                <div class="seq-symbol" title="Radiation">☢️</div>
+                <div class="seq-digit" id="st1-slot-0">_</div>
+              </div>
+              <div class="seq-slot" data-slot="1">
+                <div class="seq-index">POS 02</div>
+                <div class="seq-symbol" title="Gear">⚙️</div>
+                <div class="seq-digit" id="st1-slot-1">_</div>
+              </div>
+              <div class="seq-slot" data-slot="2">
+                <div class="seq-index">POS 03</div>
+                <div class="seq-symbol" title="Red Triangle">🔺</div>
+                <div class="seq-digit" id="st1-slot-2">_</div>
+              </div>
+              <div class="seq-slot" data-slot="3">
+                <div class="seq-index">POS 04</div>
+                <div class="seq-symbol" title="Biohazard">☣️</div>
+                <div class="seq-digit" id="st1-slot-3">_</div>
+              </div>
+              <div class="seq-slot" data-slot="4">
+                <div class="seq-index">POS 05</div>
+                <div class="seq-symbol" title="Snowflake">❄️</div>
+                <div class="seq-digit" id="st1-slot-4">_</div>
+              </div>
+              <div class="seq-slot" data-slot="5">
+                <div class="seq-index">POS 06</div>
+                <div class="seq-symbol" title="Radiation">☢️</div>
+                <div class="seq-digit" id="st1-slot-5">_</div>
+              </div>
+            </div>
+
+            <!-- Status Message Readout -->
+            <div class="terminal-readout" id="st1Readout">
+              AWAITING 6-DIGIT SYMBOL OVERRIDE CODE...
+            </div>
+
+            <!-- Tactical Numeric Keypad -->
+            <div class="keypad-wrapper" id="st1KeypadWrapper">
+              <div class="keypad-grid" id="st1Keypad">
+                <button class="key-btn" data-key="1">1</button>
+                <button class="key-btn" data-key="2">2</button>
+                <button class="key-btn" data-key="3">3</button>
+                <button class="key-btn" data-key="4">4</button>
+                <button class="key-btn" data-key="5">5</button>
+                <button class="key-btn" data-key="6">6</button>
+                <button class="key-btn" data-key="7">7</button>
+                <button class="key-btn" data-key="8">8</button>
+                <button class="key-btn" data-key="9">9</button>
+                <button class="key-btn key-clear" data-key="CLR">CLR</button>
+                <button class="key-btn" data-key="0">0</button>
+                <button class="key-btn key-del" data-key="DEL">⌫ DEL</button>
+              </div>
+              <button class="unlock-submit-btn" id="st1SubmitBtn">
+                🔓 ENGAGE BLAST DOOR OVERRIDE
+              </button>
+            </div>
+
+            <!-- Victory Banner (Shown when 578565 is entered) -->
+            <div class="victory-overlay hidden" id="st1VictoryOverlay">
+              <div class="victory-icon">✅</div>
+              <h3>ACCESS GRANTED // BLAST DOOR UNLOCKED</h3>
+              <p class="victory-code-confirm">SEQUENCE VERIFIED: <strong>5 - 7 - 8 - 5 - 6 - 5</strong></p>
+              <div class="next-station-directive">
+                <span>NEXT OBJECTIVE</span>
+                <strong>PROCEED IMMEDIATELY TO STATION 02</strong>
+              </div>
+              <div class="victory-actions">
+                <button class="action-btn primary" data-launch="station-2">GO TO STATION 02 SCREEN →</button>
+                <button class="action-btn secondary" id="st1ResetBtn">↺ RESET STATION 01 FOR NEXT TEAM</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEWS 2–5: PLACEHOLDER STATIONS (CONFIGURABLE) ==================== -->
+    <section class="view-section" id="view-station-generic">
+      <div class="station-layout">
+        <aside class="station-sidebar">
+          <div class="terminal-panel">
+            <div class="panel-header">
+              <span class="panel-tag" id="genStationTag">STATION 02 // BRIEFING</span>
+              <span class="live-indicator">● STANDBY</span>
+            </div>
+            <h2 class="station-main-title" id="genStationTitle">SECTOR BETA: REACTOR OVERRIDE</h2>
+            <p class="mission-text" id="genStationDesc">
+              Placeholder module for this bunker station. While your group prepares the custom game for this station, you can test it with a custom passcode or edit its settings below.
+            </p>
+          </div>
+
+          <!-- Crew Configurator for Placeholder Stations -->
+          <div class="terminal-panel crew-config-panel">
+            <div class="panel-header">
+              <span class="panel-tag">⚙️ G11 SCB CREW CONFIGURATOR</span>
+            </div>
+            <p class="scratchpad-hint">Customize this station's title, clue prompt, and target passcode right from the browser:</p>
+            <div class="config-form">
+              <label>
+                <span>Station Title</span>
+                <input type="text" id="cfgTitleInput" />
+              </label>
+              <label>
+                <span>Mission Prompt / Clue</span>
+                <textarea id="cfgDescInput" rows="3"></textarea>
+              </label>
+              <label>
+                <span>Target Unlock Code</span>
+                <input type="text" id="cfgCodeInput" maxlength="12" />
+              </label>
+              <button class="apply-scratch-btn" id="saveStationConfigBtn" type="button">
+                💾 SAVE STATION SETTINGS
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="station-console">
+          <div class="terminal-panel console-panel" id="genConsolePanel">
+            <div class="panel-header">
+              <span class="panel-tag" id="genConsoleTag">STATION TERMINAL</span>
+              <span class="lock-state-badge locked" id="genLockBadge">🔒 SYSTEM LOCKED</span>
+            </div>
+
+            <div class="sequence-Instruction">ENTER STATION OVERRIDE CODE:</div>
+            <div class="generic-code-display" id="genCodeDisplay">_ _ _ _</div>
+
+            <div class="terminal-readout" id="genReadout">
+              AWAITING OVERRIDE AUTHORIZATION...
+            </div>
+
+            <div class="keypad-wrapper" id="genKeypadWrapper">
+              <div class="keypad-grid" id="genKeypad">
+                <button class="key-btn" data-gkey="1">1</button>
+                <button class="key-btn" data-gkey="2">2</button>
+                <button class="key-btn" data-gkey="3">3</button>
+                <button class="key-btn" data-gkey="4">4</button>
+                <button class="key-btn" data-gkey="5">5</button>
+                <button class="key-btn" data-gkey="6">6</button>
+                <button class="key-btn" data-gkey="7">7</button>
+                <button class="key-btn" data-gkey="8">8</button>
+                <button class="key-btn" data-gkey="9">9</button>
+                <button class="key-btn key-clear" data-gkey="CLR">CLR</button>
+                <button class="key-btn" data-gkey="0">0</button>
+                <button class="key-btn key-del" data-gkey="DEL">⌫ DEL</button>
+              </div>
+              <button class="unlock-submit-btn" id="genSubmitBtn">
+                🔓 VERIFY OVERRIDE CODE
+              </button>
+            </div>
+
+            <div class="victory-overlay hidden" id="genVictoryOverlay">
+              <div class="victory-icon">✅</div>
+              <h3 id="genVictoryTitle">STATION OVERRIDE COMPLETE</h3>
+              <div class="next-station-directive">
+                <span>STATUS</span>
+                <strong id="genNextDirective">PROCEED TO THE NEXT BUNKER STATION</strong>
+              </div>
+              <div class="victory-actions">
+                <button class="action-btn secondary" id="genResetBtn">↺ RESET STATION FOR NEXT TEAM</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Printable / Reference Modal for Station 01 Scattered Equations -->
+  <div class="modal-backdrop hidden" id="cluesModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🖨️ STATION 01 — SCATTERED ROOM EQUATION CARDS (G11 SCB CREW REFERENCE)</h3>
+        <button class="close-modal-btn" id="closeCluesModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">
+          Hide these <strong>6 equation cards</strong> around the physical room for Station 01. Players must find them, solve each symbol's value, and enter the sequence <strong>☢️ ⚙️ 🔺 ☣️ ❄️ ☢️</strong> (<code>578565</code>) into the terminal.
+        </p>
+        <div class="printable-cards-grid">
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #1</span>
+            <div class="clue-math">☢️ + ☢️ = 10</div>
+            <span class="clue-ans">Crew Note: ☢️ = 5</span>
+          </div>
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #2</span>
+            <div class="clue-math">☢️ + ⚙️ = 12</div>
+            <span class="clue-ans">Crew Note: ⚙️ = 7</span>
+          </div>
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #3</span>
+            <div class="clue-math">⚙️ + 🔺 = 15</div>
+            <span class="clue-ans">Crew Note: 🔺 = 8</span>
+          </div>
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #4</span>
+            <div class="clue-math">🔺 + ☣️ = 13</div>
+            <span class="clue-ans">Crew Note: ☣️ = 5</span>
+          </div>
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #5</span>
+            <div class="clue-math">☣️ + ❄️ = 11</div>
+            <span class="clue-ans">Crew Note: ❄️ = 6</span>
+          </div>
+          <div class="clue-card">
+            <span class="clue-num">CLUE CARD #6</span>
+            <div class="clue-math">❄️ + ❄️ = 12</div>
+            <span class="clue-ans">Crew Note: ❄️ = 6</span>
+          </div>
+        </div>
+        <div class="modal-solution-summary">
+          <strong>DOOR SEQUENCE:</strong> ☢️ (5) &nbsp; ⚙️ (7) &nbsp; 🔺 (8) &nbsp; ☣️ (5) &nbsp; ❄️ (6) &nbsp; ☢️ (5) &nbsp; ➔ &nbsp; <code class="final-code-pill">578565</code>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn primary" onclick="window.print()">🖨️ PRINT CLUE CARDS</button>
+        <button class="action-btn secondary" id="closeCluesModalBtn2">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hazard-border bottom-hazard"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
