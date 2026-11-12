@@ -350,94 +350,179 @@
           </div>
         </div>
 
-        <!-- MODE B: STATION 03 INTERACTIVE SIMPLE CIRCUIT & MATERIAL LAB -->
+        <!-- MODE B: STATION 03 INTERACTIVE 2-PHASE CHALLENGE (PHASE 1: CHECKLIST -> PHASE 2: CONSTRUCT CIRCUIT) -->
         <div class="hardware-module circuit-lab-module hidden" id="circuitLabModule">
           <div class="module-title-bar">
-            <span class="module-code">MOD-03 // SIMPLE CIRCUIT &amp; CONDUCTOR TEST BENCH</span>
-            <span class="security-chip locked" id="circuitStatusChip">⚡ CIRCUIT DE-ENERGIZED</span>
+            <span class="module-code" id="st3PhaseHeaderCode">MOD-03 // PHASE 1: SCAVENGER MATERIALS CHECKLIST</span>
+            <span class="security-chip locked" id="circuitStatusChip">📦 LOCATE MATERIALS (0/4)</span>
           </div>
 
-          <!-- Interactive Circuit Schematic Workbench -->
-          <div class="circuit-board-well" id="circuitBoardWell">
-            <div class="circuit-board-instruction">
-              CLICK SLOTS 1, 2, AND 3 TO ASSEMBLE THE CIRCUIT — THEN CLAMP A CONDUCTIVE MATERIAL INTO SLOT 4:
+          <!-- ==================== PHASE 1: MATERIALS TO FIND CHECKLIST ==================== -->
+          <div class="st3-phase1-container" id="st3Phase1Box">
+            <div class="phase-banner">
+              <span class="phase-step-pill">STEP 1 OF 2 // ROOM SCAVENGER CHECKLIST</span>
+              <h3>FIND THESE 4 CIRCUIT ITEMS IN THE BUNKER</h3>
+              <p>Search Station 03 for the required electrical components and test materials. Check off each item below once your team has found it to unlock the Circuit Construction Workbench:</p>
             </div>
 
-            <div class="circuit-schematic-stage" id="circuitStage">
-              <!-- Animated SVG Circuit Loop Traces -->
-              <svg class="circuit-traces-svg" viewBox="0 0 600 260" preserveAspectRatio="none">
-                <!-- Base dark copper trace loop -->
-                <rect x="70" y="38" width="460" height="184" rx="18" class="trace-base" />
-                <!-- Active glowing electron flow trace (visible when energized with conductor) -->
-                <rect x="70" y="38" width="460" height="184" rx="18" class="trace-electrons" id="electronTrace" />
-              </svg>
-
-              <!-- TOP NODE: Slot 2 - Positive Copper Wire Lead -->
-              <button class="circuit-node node-top" id="nodeWireBtn" type="button">
-                <span class="node-step-badge">SLOT 2 // TOP LEAD</span>
-                <div class="node-visual" id="nodeWireVisual">➕ CLICK TO CONNECT COPPER WIRE</div>
-                <span class="node-status-tag" id="nodeWireTag">DISCONNECTED</span>
-              </button>
-
-              <!-- LEFT NODE: Slot 1 - 12V Battery Power Cell -->
-              <button class="circuit-node node-left" id="nodeBatteryBtn" type="button">
-                <span class="node-step-badge">SLOT 1 // POWER SOURCE</span>
-                <div class="node-visual" id="nodeBatteryVisual">🔋 CLICK TO MOUNT 12V BATTERY</div>
-                <span class="node-status-tag" id="nodeBatteryTag">EMPTY SOCKET</span>
-              </button>
-
-              <!-- CENTER ILLUMINATED DOOR FINDER BEACON -->
-              <div class="circuit-center-beacon" id="circuitCenterBeacon">
-                <div class="bulb-dome" id="bulbDome">
-                  <span class="bulb-icon">💡</span>
+            <div class="scavenger-checklist-grid" id="scavengerChecklistGrid">
+              <!-- Item 1 -->
+              <div class="scav-item" data-scav="0">
+                <div class="scav-icon">🔋</div>
+                <div class="scav-details">
+                  <span class="scav-tag">COMPONENT #01 // POWER SOURCE</span>
+                  <h4>12V DC Power Cell (Battery)</h4>
+                  <p>Provides voltage to push electrons through the circuit loop.</p>
                 </div>
-                <div class="beacon-caption" id="beaconCaption">BULB OFFLINE — DARK CORRIDOR</div>
+                <button class="scav-check-btn" data-scav-btn="0" type="button">
+                  ⬜ MARK FOUND
+                </button>
               </div>
 
-              <!-- RIGHT NODE: Slot 3 - Emergency Light Bulb -->
-              <button class="circuit-node node-right" id="nodeBulbBtn" type="button">
-                <span class="node-step-badge">SLOT 3 // LOAD SOCKET</span>
-                <div class="node-visual" id="nodeBulbVisual">💡 CLICK TO SCREW IN LIGHT BULB</div>
-                <span class="node-status-tag" id="nodeBulbTag">UNINSTALLED</span>
-              </button>
+              <!-- Item 2 -->
+              <div class="scav-item" data-scav="1">
+                <div class="scav-icon">⚡</div>
+                <div class="scav-details">
+                  <span class="scav-tag">COMPONENT #02 // CONDUCTIVE PATH</span>
+                  <h4>Copper Wire Leads &amp; Alligator Clips</h4>
+                  <p>Connects the battery terminals to the bulb socket (one wire is severed!).</p>
+                </div>
+                <button class="scav-check-btn" data-scav-btn="1" type="button">
+                  ⬜ MARK FOUND
+                </button>
+              </div>
 
-              <!-- BOTTOM NODE: Slot 4 - Severed Wire Alligator Clips (Material Bridge) -->
-              <div class="circuit-node node-bottom" id="nodeGapBox">
-                <span class="node-step-badge">SLOT 4 // BROKEN WIRE GAP (ALLIGATOR CLIPS)</span>
-                <div class="alligator-gap-row">
-                  <span class="clip-jaw">🐊 CLIP-L</span>
-                  <div class="clamped-material-slot" id="clampedMaterialDisplay">
-                    ⚠️ WIRE SEVERED — SELECT A MATERIAL BELOW
+              <!-- Item 3 -->
+              <div class="scav-item" data-scav="2">
+                <div class="scav-icon">💡</div>
+                <div class="scav-details">
+                  <span class="scav-tag">COMPONENT #03 // ELECTRICAL LOAD</span>
+                  <h4>Emergency Filament Light Bulb</h4>
+                  <p>Lights up the dark bunker corridor to reveal the hidden door when powered.</p>
+                </div>
+                <button class="scav-check-btn" data-scav-btn="2" type="button">
+                  ⬜ MARK FOUND
+                </button>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="scav-item" data-scav="3">
+                <div class="scav-icon">🧰</div>
+                <div class="scav-details">
+                  <span class="scav-tag">COMPONENT #04 // WIRE REPLACEMENT SAMPLES</span>
+                  <h4>Mystery Test Materials Tray (Metals vs. Non-Metals)</h4>
+                  <p>Assorted bunker objects (Copper, Iron Nail, Foil, Key, Wood, Rubber, Plastic, Glass) to test which material can replace the broken wire.</p>
+                </div>
+                <button class="scav-check-btn" data-scav-btn="3" type="button">
+                  ⬜ MARK FOUND
+                </button>
+              </div>
+            </div>
+
+            <div class="phase1-progress-bar-wrap">
+              <div class="phase1-progress-label">
+                <span>MATERIALS RECOVERY PROGRESS</span>
+                <strong id="scavProgressCount">0 / 4 ITEMS FOUND</strong>
+              </div>
+              <div class="phase1-progress-track">
+                <div class="phase1-progress-fill" id="scavProgressFill" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="actuator-housing">
+              <button class="actuator-btn disabled-actuator" id="proceedToCircuitBtn" type="button" disabled>
+                <span class="actuator-label" id="proceedToCircuitLabel">🔒 FIND ALL 4 MATERIALS ABOVE TO CONSTRUCT CIRCUIT</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ==================== PHASE 2: CONSTRUCT THE SIMPLE CIRCUIT ==================== -->
+          <div class="st3-phase2-container hidden" id="st3Phase2Box">
+            <div class="phase2-top-bar">
+              <span class="phase-step-pill">STEP 2 OF 2 // CONSTRUCT THE SIMPLE CIRCUIT</span>
+              <button class="recessed-mini-btn" id="backToChecklistBtn" type="button">← BACK TO MATERIALS CHECKLIST</button>
+            </div>
+
+            <!-- Interactive Circuit Schematic Workbench -->
+            <div class="circuit-board-well" id="circuitBoardWell">
+              <div class="circuit-board-instruction">
+                CLICK SLOTS 1, 2, AND 3 TO CONSTRUCT THE CIRCUIT — THEN CLAMP A CONDUCTIVE MATERIAL INTO SLOT 4:
+              </div>
+
+              <div class="circuit-schematic-stage" id="circuitStage">
+                <!-- Animated SVG Circuit Loop Traces -->
+                <svg class="circuit-traces-svg" viewBox="0 0 600 260" preserveAspectRatio="none">
+                  <rect x="70" y="38" width="460" height="184" rx="18" class="trace-base" />
+                  <rect x="70" y="38" width="460" height="184" rx="18" class="trace-electrons" id="electronTrace" />
+                </svg>
+
+                <!-- TOP NODE: Slot 2 - Positive Copper Wire Lead -->
+                <button class="circuit-node node-top" id="nodeWireBtn" type="button">
+                  <span class="node-step-badge">SLOT 2 // TOP LEAD</span>
+                  <div class="node-visual" id="nodeWireVisual">➕ CLICK TO CONNECT COPPER WIRE</div>
+                  <span class="node-status-tag" id="nodeWireTag">DISCONNECTED</span>
+                </button>
+
+                <!-- LEFT NODE: Slot 1 - 12V Battery Power Cell -->
+                <button class="circuit-node node-left" id="nodeBatteryBtn" type="button">
+                  <span class="node-step-badge">SLOT 1 // POWER SOURCE</span>
+                  <div class="node-visual" id="nodeBatteryVisual">🔋 CLICK TO MOUNT 12V BATTERY</div>
+                  <span class="node-status-tag" id="nodeBatteryTag">EMPTY SOCKET</span>
+                </button>
+
+                <!-- CENTER ILLUMINATED DOOR FINDER BEACON -->
+                <div class="circuit-center-beacon" id="circuitCenterBeacon">
+                  <div class="bulb-dome" id="bulbDome">
+                    <span class="bulb-icon">💡</span>
                   </div>
-                  <span class="clip-jaw">CLIP-R 🐊</span>
+                  <div class="beacon-caption" id="beaconCaption">BULB OFFLINE — DARK CORRIDOR</div>
+                </div>
+
+                <!-- RIGHT NODE: Slot 3 - Emergency Light Bulb -->
+                <button class="circuit-node node-right" id="nodeBulbBtn" type="button">
+                  <span class="node-step-badge">SLOT 3 // LOAD SOCKET</span>
+                  <div class="node-visual" id="nodeBulbVisual">💡 CLICK TO SCREW IN LIGHT BULB</div>
+                  <span class="node-status-tag" id="nodeBulbTag">UNINSTALLED</span>
+                </button>
+
+                <!-- BOTTOM NODE: Slot 4 - Severed Wire Alligator Clips (Material Bridge) -->
+                <div class="circuit-node node-bottom" id="nodeGapBox">
+                  <span class="node-step-badge">SLOT 4 // BROKEN WIRE GAP (ALLIGATOR CLIPS)</span>
+                  <div class="alligator-gap-row">
+                    <span class="clip-jaw">🐊 CLIP-L</span>
+                    <div class="clamped-material-slot" id="clampedMaterialDisplay">
+                      ⚠️ WIRE SEVERED — SELECT A MATERIAL BELOW
+                    </div>
+                    <span class="clip-jaw">CLIP-R 🐊</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- VFD Status Readout for Circuit Lab -->
-          <div class="vfd-display-well">
-            <div class="vfd-text" id="circuitVfdReadout">
-              STEP 1: CLICK SLOTS 1, 2 &amp; 3 ON THE CIRCUIT BOARD TO ASSEMBLE COMPONENTS...
+            <!-- VFD Status Readout for Circuit Lab -->
+            <div class="vfd-display-well">
+              <div class="vfd-text" id="circuitVfdReadout">
+                CLICK SLOTS 1, 2 &amp; 3 ON THE CIRCUIT BOARD TO CONSTRUCT THE CIRCUIT...
+              </div>
             </div>
-          </div>
 
-          <!-- Material Selection Tray (Replace the Broken Wire) -->
-          <div class="materials-tray-housing">
-            <div class="tray-header">
-              <span>SELECT A TEST MATERIAL TO REPLACE THE BROKEN WIRE IN SLOT 4:</span>
-              <span class="tray-sub">WHICH MATERIAL CONDUCTS ELECTRICITY TO LIGHT THE BULB?</span>
+            <!-- Material Selection Tray (Replace the Broken Wire) -->
+            <div class="materials-tray-housing">
+              <div class="tray-header">
+                <span>SELECT A MATERIAL TO REPLACE THE BROKEN WIRE IN SLOT 4:</span>
+                <span class="tray-sub">WHICH MATERIAL CONDUCTS ELECTRICITY TO LIGHT THE BULB?</span>
+              </div>
+              <div class="materials-tray-grid" id="circuitMaterialsGrid">
+                <!-- Populated dynamically -->
+              </div>
             </div>
-            <div class="materials-tray-grid" id="circuitMaterialsGrid">
-              <!-- Populated dynamically with the 8 test materials (Wood, Copper, Rubber, Iron Nail, Plastic, Aluminum Foil, Glass, Brass Key) -->
-            </div>
-          </div>
 
-          <!-- Master Circuit Breaker Switch -->
-          <div class="actuator-housing">
-            <button class="actuator-btn" id="testCircuitBreakerBtn" type="button">
-              <span class="actuator-label">⚡ ENGAGE BREAKER SWITCH &amp; TEST CIRCUIT</span>
-            </button>
+            <!-- Master Circuit Breaker Switch -->
+            <div class="actuator-housing">
+              <button class="actuator-btn" id="testCircuitBreakerBtn" type="button">
+                <span class="actuator-label">⚡ ENGAGE BREAKER SWITCH &amp; LIGHT UP BULB</span>
+              </button>
+            </div>
           </div>
         </div>
 

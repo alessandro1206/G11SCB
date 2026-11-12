@@ -209,8 +209,10 @@ let state = {
   activeSlot: 0,
   unlocked: false,
   sfxEnabled: true,
-  // Station 03 Simple Circuit Lab State
+  // Station 03 Simple Circuit Lab State (2 Phases: Phase 1 Scavenger Checklist -> Phase 2 Construct Circuit)
   circuit: {
+    phase: 1, // 1 = Scavenger Checklist, 2 = Construct Circuit
+    scavengerFound: [false, false, false, false],
     batteryInstalled: false,
     wireInstalled: false,
     bulbInstalled: false,
@@ -247,6 +249,8 @@ function assignDeviceToStation(stationNum) {
   state.unlocked = false;
   state.activeSlot = 0;
   state.circuit = {
+    phase: 1,
+    scavengerFound: [false, false, false, false],
     batteryInstalled: false,
     wireInstalled: false,
     bulbInstalled: false,
@@ -581,6 +585,65 @@ function renderCircuitLabState() {
   const mats = getCurrentStationConfig().circuitMaterials || DEFAULT_CIRCUIT_MATERIALS;
   const chosenMat = mats.find((m) => m.id === c.selectedMaterialId) || null;
 
+  // Phase 1 vs Phase 2 Visibility
+  const phase1Box = document.getElementById('st3Phase1Box');
+  const phase2Box = document.getElementById('st3Phase2Box');
+  const phaseHeaderCode = document.getElementById('st3PhaseHeaderCode');
+  const statusChip = document.getElementById('circuitStatusChip');
+
+  const foundArr = Array.isArray(c.scavengerFound) ? c.scavengerFound : [false, false, false, false];
+  const foundCount = foundArr.filter(Boolean).length;
+  const allScavFound = foundCount === 4;
+
+  // Render Phase 1 Scavenger Checklist items
+  document.querySelectorAll('#scavengerChecklistGrid .scav-item').forEach((itemEl, idx) => {
+    const isFound = !!foundArr[idx];
+    itemEl.classList.toggle('found', isFound);
+    const btn = itemEl.querySelector('.scav-check-btn');
+    if (btn) {
+      btn.textContent = isFound ? '✅ FOUND IN ROOM' : '⬜ MARK FOUND';
+    }
+  });
+
+  const progCountEl = document.getElementById('scavProgressCount');
+  if (progCountEl) progCountEl.textContent = `${foundCount} / 4 ITEMS FOUND`;
+  const progFillEl = document.getElementById('scavProgressFill');
+  if (progFillEl) progFillEl.style.width = `${(foundCount / 4) * 100}%`;
+
+  const proceedBtn = document.getElementById('proceedToCircuitBtn');
+  const proceedLabel = document.getElementById('proceedToCircuitLabel');
+  if (proceedBtn && proceedLabel) {
+    proceedBtn.disabled = !allScavFound;
+    proceedBtn.classList.toggle('disabled-actuator', !allScavFound);
+    proceedLabel.textContent = allScavFound
+      ? '🔓 ALL MATERIALS FOUND — CONSTRUCT CIRCUIT NOW →'
+      : `🔒 FIND ALL 4 MATERIALS ABOVE TO CONSTRUCT CIRCUIT (${foundCount}/4)`;
+  }
+
+  if (c.phase === 1) {
+    phase1Box.classList.remove('hidden');
+    phase2Box.classList.add('hidden');
+    if (phaseHeaderCode) {
+      phaseHeaderCode.textContent = 'MOD-03 // PHASE 1: SCAVENGER MATERIALS CHECKLIST';
+    }
+    if (statusChip) {
+      statusChip.textContent = allScavFound
+        ? '✅ 4/4 MATERIALS READY'
+        : `📦 LOCATE MATERIALS (${foundCount}/4)`;
+      statusChip.className = allScavFound ? 'security-chip unlocked' : 'security-chip locked';
+    }
+  } else {
+    phase1Box.classList.add('hidden');
+    phase2Box.classList.remove('hidden');
+    if (phaseHeaderCode) {
+      phaseHeaderCode.textContent = 'MOD-03 // PHASE 2: SIMPLE CIRCUIT CONSTRUCTION';
+    }
+    if (statusChip && !c.energized) {
+      statusChip.textContent = '⚡ CIRCUIT DE-ENERGIZED';
+      statusChip.className = 'security-chip locked';
+    }
+  }
+
   // 1. Node 1: 12V Battery
   const batBtn = document.getElementById('nodeBatteryBtn');
   const batVis = document.getElementById('nodeBatteryVisual');
@@ -752,6 +815,8 @@ async function testCircuitBreaker() {
 function resetCircuitLab() {
   playControlClick();
   state.circuit = {
+    phase: 1,
+    scavengerFound: [false, false, false, false],
     batteryInstalled: false,
     wireInstalled: false,
     bulbInstalled: false,
@@ -1070,6 +1135,44 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetSt = parseInt(pill.dataset.st, 10);
       assignDeviceToStation(targetSt);
     });
+  });
+
+  // Station 03 Phase 1: Scavenger Checklist Buttons
+  const scavNames = [
+    '12V DC POWER CELL',
+    'COPPER WIRE LEADS & CLIPS',
+    'EMERGENCY FILAMENT BULB',
+    'MYSTERY TEST MATERIALS TRAY'
+  ];
+  document.querySelectorAll('[data-scav-btn]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (state.unlocked) return;
+      const idx = parseInt(btn.dataset.scavBtn, 10);
+      playComponentSnapSound();
+      state.circuit.scavengerFound[idx] = !state.circuit.scavengerFound[idx];
+      appendCrtLog(
+        'SCAV',
+        state.circuit.scavengerFound[idx]
+          ? `FOUND ITEM #0${idx + 1}: ${scavNames[idx]}`
+          : `UNMARKED ITEM #0${idx + 1}`
+      );
+      renderCircuitLabState();
+    });
+  });
+
+  document.getElementById('proceedToCircuitBtn').addEventListener('click', () => {
+    if (state.circuit.scavengerFound.every(Boolean)) {
+      playAirlockUnlockSound();
+      state.circuit.phase = 2;
+      appendCrtLog('SYS', 'ALL 4 MATERIALS RECOVERED — CIRCUIT WORKBENCH UNLOCKED!', true);
+      renderCircuitLabState();
+    }
+  });
+
+  document.getElementById('backToChecklistBtn').addEventListener('click', () => {
+    playControlClick();
+    state.circuit.phase = 1;
+    renderCircuitLabState();
   });
 
   // Station 03 Interactive Circuit Nodes (Slots 1, 2, 3)
