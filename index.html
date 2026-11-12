@@ -15,77 +15,137 @@
   <div class="crt-scanlines" aria-hidden="true"></div>
 
   <!-- ======================================================================= -->
-  <!-- 1. FIRST SCREEN: G11-SCB BUNKER ESCAPE ROOM LANDING PAGE                -->
+  <!-- 1. FIRST SCREEN: G11-SCB BUNKER LANDING PAGE WITH 5 CHALLENGE BOXES     -->
   <!-- ======================================================================= -->
   <section class="bunker-landing-screen" id="bunkerLandingPage">
     <div class="hazard-strip"></div>
 
     <div class="landing-chassis">
       <div class="landing-top-bar">
-        <span class="landing-classification">CLASSIFIED // FACILITY G11-SCB // DEPTH: -140M</span>
-        <span class="landing-alert-pill">● CONTAINMENT LOCKDOWN ACTIVE</span>
+        <div class="landing-brand-row">
+          <span class="vault-mini-icon">☢️</span>
+          <div>
+            <span class="landing-classification">CLASSIFIED // FACILITY G11-SCB // DEPTH: -140M</span>
+            <h1 class="landing-header-title">SECTOR G11-SCB // <span>BUNKER ESCAPE ROOM CONTROL HUB</span></h1>
+          </div>
+        </div>
+        <span class="landing-alert-pill">● 05 SECURITY SECTORS ACTIVE</span>
       </div>
 
-      <div class="landing-hero-grid">
-        <!-- Left: Rotating Containment Vault Emblem -->
-        <div class="landing-vault-visual">
-          <div class="vault-outer-ring">
-            <div class="vault-inner-ring">
-              <span class="vault-symbol">☢️</span>
-              <span class="vault-code">G11-SCB</span>
-            </div>
-          </div>
-          <div class="vault-telemetry-readout">
-            <div><span>FACILITY STATUS:</span> <strong class="text-crimson">SEALED</strong></div>
-            <div><span>SECURITY SECTORS:</span> <strong class="text-amber">05 STATIONS</strong></div>
-            <div><span>TERMINAL LINK:</span> <strong class="text-emerald" id="landingAssignedStation">STATION 01</strong></div>
-          </div>
-        </div>
+      <p class="landing-intro-text">
+        Select your station's challenge module below to initialize that device's bunker terminal. Complete each challenge until the screen turns full green (<strong>ACCESS GRANTED</strong>).
+      </p>
 
-        <!-- Right: Escape Room Mission Briefing & Launch Actuator -->
-        <div class="landing-briefing-panel">
-          <div class="landing-badge">EMERGENCY BUNKER OVERRIDE PROTOCOL</div>
-          <h1 class="landing-main-title">SECTOR G11-SCB<br/><span>ESCAPE ROOM CONTROL SYSTEM</span></h1>
-          <p class="landing-lore">
-            An automated containment lockdown has sealed the underground bunker across <strong>5 security stations</strong>. To unseal the blast doors and escape, your team must search the physical room for hidden clues, solve the station override challenge on this terminal, and advance to the next sector.
+      <!-- 5 BOXES FOR EACH OF THE 5 GAMES -->
+      <div class="landing-five-boxes-grid" id="landingBoxesGrid">
+
+        <!-- BOX 1: CHALLENGE 01 -->
+        <article class="challenge-box ready-box" data-launch-station="1">
+          <div class="cbox-top">
+            <span class="cbox-num">CHALLENGE 01 // SECTOR ALPHA</span>
+            <span class="cbox-status" id="cbox-status-1">🔒 ACTIVE</span>
+          </div>
+          <div class="cbox-icon-row">
+            <span class="cbox-main-icon">☢️</span>
+            <div class="cbox-mini-glyphs">☢️ ⚙️ 🔺 ☣️ ❄️ ☢️</div>
+          </div>
+          <h2 class="cbox-title" id="cbox-title-1">SYMBOL SEQUENCE BLAST DOOR</h2>
+          <p class="cbox-desc">
+            Find the 6 symbol equations scattered in the room, solve the numerical value of each symbol, and input the 6-digit door sequence.
           </p>
-
-          <div class="landing-directives-box">
-            <div class="ld-item">
-              <span class="ld-num">01</span>
-              <div>
-                <strong>SEARCH THE BUNKER ROOM</strong>
-                <p>Locate the physical equations, components, or cipher clues hidden around this station.</p>
-              </div>
-            </div>
-            <div class="ld-item">
-              <span class="ld-num">02</span>
-              <div>
-                <strong>COMPLETE THIS TERMINAL CHALLENGE</strong>
-                <p id="landingStationDesc">Assigned Terminal: Station 01 — Airlock Alpha Blast Door</p>
-              </div>
-            </div>
-            <div class="ld-item">
-              <span class="ld-num">03</span>
-              <div>
-                <strong>UNSEAL DOOR &amp; ADVANCE</strong>
-                <p>When the screen turns full emerald green (ACCESS GRANTED), proceed immediately to the next station.</p>
-              </div>
-            </div>
-          </div>
-
-          <button class="landing-enter-btn" id="enterTerminalBtn" type="button">
-            <span>🚨 INITIALIZE BUNKER TERMINAL</span>
-            <span class="enter-arrow">→</span>
+          <button class="cbox-launch-btn" data-launch-station="1" type="button">
+            <span>LAUNCH CHALLENGE 01</span>
+            <span>→</span>
           </button>
-        </div>
+        </article>
+
+        <!-- BOX 2: CHALLENGE 02 -->
+        <article class="challenge-box" data-launch-station="2">
+          <div class="cbox-top">
+            <span class="cbox-num">CHALLENGE 02 // SECTOR BETA</span>
+            <span class="cbox-status" id="cbox-status-2">🔒 ACTIVE</span>
+          </div>
+          <div class="cbox-icon-row">
+            <span class="cbox-main-icon">⚡</span>
+            <div class="cbox-mini-glyphs">REACTOR CORE</div>
+          </div>
+          <h2 class="cbox-title" id="cbox-title-2">REACTOR CORE OVERRIDE</h2>
+          <p class="cbox-desc">
+            Locate the Sector Beta stabilization clues and enter the reactor override passcode on the tactical keypad terminal.
+          </p>
+          <button class="cbox-launch-btn" data-launch-station="2" type="button">
+            <span>LAUNCH CHALLENGE 02</span>
+            <span>→</span>
+          </button>
+        </article>
+
+        <!-- BOX 3: CHALLENGE 03 -->
+        <article class="challenge-box ready-box" data-launch-station="3">
+          <div class="cbox-top">
+            <span class="cbox-num">CHALLENGE 03 // SECTOR GAMMA</span>
+            <span class="cbox-status" id="cbox-status-3">🔒 ACTIVE</span>
+          </div>
+          <div class="cbox-icon-row">
+            <span class="cbox-main-icon">💡</span>
+            <div class="cbox-mini-glyphs">🔋 + ⚡ + 🪙 = 💡</div>
+          </div>
+          <h2 class="cbox-title" id="cbox-title-3">SIMPLE CIRCUIT &amp; CONDUCTOR LAB</h2>
+          <p class="cbox-desc">
+            Complete the 4-item materials scavenger checklist, construct a simple circuit, and test materials to replace the broken wire and light up the bulb.
+          </p>
+          <button class="cbox-launch-btn" data-launch-station="3" type="button">
+            <span>LAUNCH CHALLENGE 03</span>
+            <span>→</span>
+          </button>
+        </article>
+
+        <!-- BOX 4: CHALLENGE 04 -->
+        <article class="challenge-box" data-launch-station="4">
+          <div class="cbox-top">
+            <span class="cbox-num">CHALLENGE 04 // SECTOR DELTA</span>
+            <span class="cbox-status" id="cbox-status-4">🔒 ACTIVE</span>
+          </div>
+          <div class="cbox-icon-row">
+            <span class="cbox-main-icon">❄️</span>
+            <div class="cbox-mini-glyphs">CRYO CHAMBER</div>
+          </div>
+          <h2 class="cbox-title" id="cbox-title-4">CRYO-CONTAINMENT TERMINAL</h2>
+          <p class="cbox-desc">
+            Inspect the Sector Delta containment logs and input the thermal stabilization override sequence to unseal the chamber.
+          </p>
+          <button class="cbox-launch-btn" data-launch-station="4" type="button">
+            <span>LAUNCH CHALLENGE 04</span>
+            <span>→</span>
+          </button>
+        </article>
+
+        <!-- BOX 5: CHALLENGE 05 -->
+        <article class="challenge-box" data-launch-station="5">
+          <div class="cbox-top">
+            <span class="cbox-num">CHALLENGE 05 // SECTOR OMEGA</span>
+            <span class="cbox-status" id="cbox-status-5">🔒 ACTIVE</span>
+          </div>
+          <div class="cbox-icon-row">
+            <span class="cbox-main-icon">🚨</span>
+            <div class="cbox-mini-glyphs">FINAL EXIT DOOR</div>
+          </div>
+          <h2 class="cbox-title" id="cbox-title-5">MASTER EVACUATION BLAST DOOR</h2>
+          <p class="cbox-desc">
+            Final bunker clearance station. Enter the master evacuation sequence to open the surface blast doors and escape!
+          </p>
+          <button class="cbox-launch-btn" data-launch-station="5" type="button">
+            <span>LAUNCH CHALLENGE 05</span>
+            <span>→</span>
+          </button>
+        </article>
+
       </div>
 
       <div class="landing-footer">
         <span>G11-SCB UNDERGROUND CONTAINMENT DIVISION // SYS.v4.5</span>
-        <!-- Subtle triple-click or crew trigger -->
+        <!-- Passcode-Protected Backend Trigger -->
         <button class="stealth-crew-lock" id="stealthCrewBtn" type="button" title="Restricted Crew Terminal">
-          🔒 CREW AUTH
+          🔒 CREW BACKEND (PASSCODE REQUIRED)
         </button>
       </div>
     </div>

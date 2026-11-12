@@ -1144,8 +1144,14 @@ document.addEventListener('DOMContentLoaded', () => {
   showLandingScreen();
   fetchPublicConfig();
 
-  // Landing Page -> Enter Bunker Terminal Button
-  document.getElementById('enterTerminalBtn').addEventListener('click', enterBunkerTerminal);
+  // Landing Page -> 5 Challenge Boxes Click Listeners
+  document.querySelectorAll('.challenge-box[data-launch-station]').forEach((box) => {
+    box.addEventListener('click', () => {
+      const targetSt = parseInt(box.dataset.launchStation, 10);
+      assignDeviceToStation(targetSt);
+      enterBunkerTerminal();
+    });
+  });
 
   // Return to Landing Screen Button in Top Header
   document.getElementById('backToLandingBtn').addEventListener('click', () => {
