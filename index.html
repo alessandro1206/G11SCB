@@ -15,7 +15,86 @@
   <div class="crt-scanlines" aria-hidden="true"></div>
 
   <!-- ======================================================================= -->
-  <!-- FULL-SCREEN GREEN "ACCESS GRANTED" TAKEOVER SCREEN (ON SOLVE)           -->
+  <!-- 1. FIRST SCREEN: G11-SCB BUNKER ESCAPE ROOM LANDING PAGE                -->
+  <!-- ======================================================================= -->
+  <section class="bunker-landing-screen" id="bunkerLandingPage">
+    <div class="hazard-strip"></div>
+
+    <div class="landing-chassis">
+      <div class="landing-top-bar">
+        <span class="landing-classification">CLASSIFIED // FACILITY G11-SCB // DEPTH: -140M</span>
+        <span class="landing-alert-pill">● CONTAINMENT LOCKDOWN ACTIVE</span>
+      </div>
+
+      <div class="landing-hero-grid">
+        <!-- Left: Rotating Containment Vault Emblem -->
+        <div class="landing-vault-visual">
+          <div class="vault-outer-ring">
+            <div class="vault-inner-ring">
+              <span class="vault-symbol">☢️</span>
+              <span class="vault-code">G11-SCB</span>
+            </div>
+          </div>
+          <div class="vault-telemetry-readout">
+            <div><span>FACILITY STATUS:</span> <strong class="text-crimson">SEALED</strong></div>
+            <div><span>SECURITY SECTORS:</span> <strong class="text-amber">05 STATIONS</strong></div>
+            <div><span>TERMINAL LINK:</span> <strong class="text-emerald" id="landingAssignedStation">STATION 01</strong></div>
+          </div>
+        </div>
+
+        <!-- Right: Escape Room Mission Briefing & Launch Actuator -->
+        <div class="landing-briefing-panel">
+          <div class="landing-badge">EMERGENCY BUNKER OVERRIDE PROTOCOL</div>
+          <h1 class="landing-main-title">SECTOR G11-SCB<br/><span>ESCAPE ROOM CONTROL SYSTEM</span></h1>
+          <p class="landing-lore">
+            An automated containment lockdown has sealed the underground bunker across <strong>5 security stations</strong>. To unseal the blast doors and escape, your team must search the physical room for hidden clues, solve the station override challenge on this terminal, and advance to the next sector.
+          </p>
+
+          <div class="landing-directives-box">
+            <div class="ld-item">
+              <span class="ld-num">01</span>
+              <div>
+                <strong>SEARCH THE BUNKER ROOM</strong>
+                <p>Locate the physical equations, components, or cipher clues hidden around this station.</p>
+              </div>
+            </div>
+            <div class="ld-item">
+              <span class="ld-num">02</span>
+              <div>
+                <strong>COMPLETE THIS TERMINAL CHALLENGE</strong>
+                <p id="landingStationDesc">Assigned Terminal: Station 01 — Airlock Alpha Blast Door</p>
+              </div>
+            </div>
+            <div class="ld-item">
+              <span class="ld-num">03</span>
+              <div>
+                <strong>UNSEAL DOOR &amp; ADVANCE</strong>
+                <p>When the screen turns full emerald green (ACCESS GRANTED), proceed immediately to the next station.</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="landing-enter-btn" id="enterTerminalBtn" type="button">
+            <span>🚨 INITIALIZE BUNKER TERMINAL</span>
+            <span class="enter-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="landing-footer">
+        <span>G11-SCB UNDERGROUND CONTAINMENT DIVISION // SYS.v4.5</span>
+        <!-- Subtle triple-click or crew trigger -->
+        <button class="stealth-crew-lock" id="stealthCrewBtn" type="button" title="Restricted Crew Terminal">
+          🔒 CREW AUTH
+        </button>
+      </div>
+    </div>
+
+    <div class="hazard-strip"></div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- 2. FULL-SCREEN GREEN "ACCESS GRANTED" TAKEOVER SCREEN (ON SOLVE)        -->
   <!-- ======================================================================= -->
   <section class="full-green-takeover hidden" id="fullGreenScreen" aria-live="assertive">
     <div class="green-hazard-bar top"></div>
@@ -44,7 +123,7 @@
       </div>
 
       <button class="green-reset-btn" id="greenResetBtn" type="button">
-        🔑 RE-LOCK TERMINAL &amp; RESET FOR NEXT TEAM (ESC)
+        🔑 RE-LOCK TERMINAL &amp; RETURN TO LANDING SCREEN (ESC)
       </button>
     </div>
 
@@ -52,9 +131,9 @@
   </section>
 
   <!-- ======================================================================= -->
-  <!-- MAIN INDUSTRIAL HARDWARE CHASSIS (SINGLE ASSIGNED DEVICE CHALLENGE)     -->
+  <!-- 3. MAIN INDUSTRIAL HARDWARE CHASSIS (SINGLE ASSIGNED DEVICE CHALLENGE)  -->
   <!-- ======================================================================= -->
-  <div class="bunker-chassis" id="mainChassis">
+  <div class="bunker-chassis hidden" id="mainChassis">
     <!-- 4 Machined Corner Hex Bolts -->
     <div class="hex-bolt bolt-tl" aria-hidden="true"></div>
     <div class="hex-bolt bolt-tr" aria-hidden="true"></div>
@@ -66,7 +145,7 @@
 
     <!-- Hardware Nameplate & Telemetry Bar -->
     <header class="hardware-header">
-      <div class="nameplate">
+      <div class="nameplate" id="secretNameplateTrigger" title="G11-SCB Hardware Unit">
         <div class="rivet r-left"></div>
         <div class="nameplate-content">
           <span class="serial-code" id="stationSerialText">UNIT: G11-SCB // SEC-01 // MK-IV</span>
@@ -100,8 +179,12 @@
         </div>
       </div>
 
-      <!-- Physical Panel Rocker Switches -->
+      <!-- Physical Panel Rocker Switches (NO PUBLIC BACKEND BUTTON) -->
       <div class="rocker-switches">
+        <button class="rocker-btn" id="backToLandingBtn" type="button" title="Return to Bunker Briefing Screen">
+          <span class="rocker-led"></span>
+          <span class="rocker-label">⌂ BRIEFING</span>
+        </button>
         <button class="rocker-btn active" id="sfxSwitchBtn" type="button" title="Toggle Terminal Audio">
           <span class="rocker-led"></span>
           <span class="rocker-label" id="sfxSwitchLabel">AUDIO: ON</span>
@@ -109,10 +192,6 @@
         <button class="rocker-btn" id="fullscreenSwitchBtn" type="button" title="Toggle Fullscreen Mode">
           <span class="rocker-led"></span>
           <span class="rocker-label">FULLSCREEN</span>
-        </button>
-        <button class="rocker-btn backend-btn" id="openBackendBtn" type="button" title="Open Backend Materials, Clues & Device Station Selector">
-          <span class="rocker-led backend-led"></span>
-          <span class="rocker-label">⚙️ BACKEND</span>
         </button>
       </div>
     </header>
@@ -450,7 +529,6 @@
               </div>
 
               <div class="circuit-schematic-stage" id="circuitStage">
-                <!-- Animated SVG Circuit Loop Traces -->
                 <svg class="circuit-traces-svg" viewBox="0 0 600 260" preserveAspectRatio="none">
                   <rect x="70" y="38" width="460" height="184" rx="18" class="trace-base" />
                   <rect x="70" y="38" width="460" height="184" rx="18" class="trace-electrons" id="electronTrace" />
@@ -539,19 +617,51 @@
   </div>
 
   <!-- ======================================================================= -->
-  <!-- BACKEND CONTROL CENTER (DEVICE CHALLENGE SELECTOR, CLUES, MATERIALS)    -->
+  <!-- 4. RESTRICTED OPERATOR PASSCODE AUTHENTICATION GATE                     -->
+  <!-- ======================================================================= -->
+  <div class="backend-modal-backdrop hidden" id="backendAuthModal">
+    <div class="auth-gate-box" id="authGateBox">
+      <div class="auth-gate-header">
+        <span class="backend-tag">RESTRICTED // G11-SCB COMMAND CLEARANCE REQUIRED</span>
+        <h3>🔒 OPERATOR BACKEND AUTHENTICATION</h3>
+      </div>
+      <p class="auth-gate-desc">
+        This area contains classified escape room answer keys, printable clues, and device station assignments. Enter the G11-SCB Operator Passcode to proceed:
+      </p>
+      <form id="operatorAuthForm" class="auth-gate-form">
+        <input
+          type="password"
+          id="operatorPasscodeInput"
+          placeholder="ENTER OPERATOR PASSCODE..."
+          autocomplete="off"
+          required
+        />
+        <div class="auth-error-msg" id="authErrorMsg"></div>
+        <div class="auth-gate-actions">
+          <button class="backend-action-btn primary" type="submit">🔓 VERIFY CLEARANCE</button>
+          <button class="backend-action-btn secondary" id="cancelAuthBtn" type="button">CANCEL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- 5. PROTECTED BACKEND CONTROL CENTER (ONLY ACCESSIBLE AFTER AUTH)        -->
   <!-- ======================================================================= -->
   <div class="backend-modal-backdrop hidden" id="backendModal">
     <div class="backend-modal-window">
       <div class="backend-modal-header">
         <div>
-          <span class="backend-tag">G11-SCB // MULTI-DEVICE BACKEND PORTAL</span>
+          <span class="backend-tag">G11-SCB // AUTHENTICATED OPERATOR PORTAL</span>
           <h2>DEVICE CHALLENGE ASSIGNER, CLUES, MATERIALS &amp; SETTINGS</h2>
         </div>
-        <button class="backend-close-btn" id="closeBackendBtn" type="button">✕ CLOSE</button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="backend-close-btn" id="lockBackendBtn" type="button">🔒 LOCK &amp; LOGOUT</button>
+          <button class="backend-close-btn" id="closeBackendBtn" type="button">✕ CLOSE</button>
+        </div>
       </div>
 
-      <!-- DEVICE CHALLENGE SELECTOR BAR (Assign which of the 5 challenges this device displays) -->
+      <!-- DEVICE CHALLENGE SELECTOR BAR -->
       <div class="device-assign-bar">
         <div class="assign-label">
           <strong>🖥️ ASSIGN THIS DEVICE TO CHALLENGE:</strong>
@@ -597,7 +707,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: REQUIRED MATERIALS & MASTER ANSWER KEY FOR ALL / SELECTED STATION -->
+        <!-- TAB 2: REQUIRED MATERIALS & MASTER ANSWER KEY FOR SELECTED STATION -->
         <div class="btab-panel" id="tab-materials">
           <div class="answer-key-banner">
             <div class="ak-block">
@@ -675,7 +785,7 @@
             <div class="settings-card hidden" id="st3CircuitConfigCard">
               <h3>STATION 03: CIRCUIT &amp; CONDUCTOR MATERIALS</h3>
               <p class="settings-hint">
-                Players must assemble the 12V Battery + Copper Wire + Light Bulb, then pick a conductive material to bridge the broken wire and light up the bulb:
+                Players must first complete the 4-item Scavenger Checklist, then assemble the 12V Battery + Copper Wire + Light Bulb, and pick a conductive material to bridge the broken wire:
               </p>
               <div class="st3-materials-summary">
                 <div class="st3-group">

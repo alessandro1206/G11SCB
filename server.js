@@ -23,9 +23,16 @@ const STATIC_FILES = {
   }
 };
 
+// Authorized Operator Passcodes (case-insensitive)
+const VALID_OPERATOR_PASSCODES = ['G11SCB', '1206', 'G11SCB1206'];
+
+function isAuthorizedPasscode(input) {
+  if (!input || typeof input !== 'string') return false;
+  return VALID_OPERATOR_PASSCODES.includes(input.trim().toUpperCase());
+}
+
 // Default Backend Configuration for ALL 5 BUNKER CHALLENGES
 const DEFAULT_BACKEND_DATA = {
-  // Challenge 1: Symbol Equation Lock (Allen's Game)
   station1Symbols: {
     radiation: { id: 'radiation', glyph: '☢️', name: 'RADIATION', value: 5 },
     gear: { id: 'gear', glyph: '⚙️', name: 'MECHANICAL GEAR', value: 7 },
@@ -35,7 +42,6 @@ const DEFAULT_BACKEND_DATA = {
   },
   station1SequenceOrder: ['radiation', 'gear', 'triangle', 'biohazard', 'snowflake', 'radiation'],
 
-  // All 5 Stations Configuration
   stations: {
     1: {
       id: 1,
@@ -91,9 +97,9 @@ const DEFAULT_BACKEND_DATA = {
       code: 'CONDUCTOR',
       crtLines: [
         '[SYS] EMERGENCY CORRIDOR LIGHT BULB OFFLINE — WIRE SEVERED.',
-        '[DIR] STEP 1: ASSEMBLE THE SIMPLE CIRCUIT (BATTERY + WIRES + BULB).',
-        '[DIR] STEP 2: SELECT A CONDUCTIVE MATERIAL TO REPLACE THE BROKEN WIRE.',
-        '[REQ] STEP 3: ENGAGE BREAKER TO LIGHT UP THE BULB & REVEAL THE DOOR!'
+        '[DIR] STEP 1: COMPLETE THE ROOM SCAVENGER MATERIALS CHECKLIST.',
+        '[DIR] STEP 2: CONSTRUCT THE SIMPLE CIRCUIT (BATTERY + WIRES + BULB).',
+        '[REQ] STEP 3: BRIDGE BROKEN WIRE WITH A CONDUCTOR TO LIGHT BULB!'
       ],
       showScratchpad: false,
       victoryTitle: 'ACCESS GRANTED // CIRCUIT ENERGIZED',
@@ -185,7 +191,7 @@ const DEFAULT_BACKEND_DATA = {
   }
 };
 
-const TMP_CONFIG_PATH = path.join(os.tmpdir(), 'g11scb_bunker_multistation_v3.json');
+const TMP_CONFIG_PATH = path.join(os.tmpdir(), 'g11scb_bunker_multistation_v4.json');
 
 function loadBackendData() {
   try {
@@ -208,7 +214,8 @@ function saveBackendData(data) {
   }
 }
 
-function buildComputedState(data) {
+// Full state including secrets (ONLY sent to authenticated Operator Backend)
+function buildFullAdminState(data) {
   const s = data.station1Symbols;
   const station1Equations = [
     {
@@ -273,7 +280,6 @@ function buildComputedState(data) {
   computedStations[1].sequenceSlots = st1SequenceSlots;
   computedStations[1].equations = station1Equations;
 
-  // Build slot descriptors for code-lock stations
   [2, 4, 5].forEach((i) => {
     const st = computedStations[i];
     if (!st) return;
@@ -286,7 +292,6 @@ function buildComputedState(data) {
     }));
   });
 
-  // Station 3 verified display badges for Full-Screen Green screen
   if (computedStations[3]) {
     computedStations[3].sequenceSlots = [
       { slot: 1, glyph: '🔋', value: '12V' },
@@ -300,6 +305,43 @@ function buildComputedState(data) {
     station1Symbols: data.station1Symbols,
     station1SequenceOrder: data.station1SequenceOrder,
     stations: computedStations
+  };
+}
+
+// Public player state (Strips out all unlock codes, equation answers, and clues so players cannot cheat)
+function buildPublicPlayerState(data) {
+  const full = buildFullAdminState(data);
+  const publicStations = {};
+
+  Object.keys(full.stations).forEach((k) => {
+    const st = full.stations[k];
+    publicStations[k] = {
+      id: st.id,
+      type: st.type,
+      serial: st.serial,
+      title: st.title,
+      crtLines: st.crtLines,
+      showScratchpad: st.showScratchpad,
+      victoryTitle: st.victoryTitle,
+      victorySubtitle: st.victorySubtitle,
+      // Only send slot glyphs & slot count — NEVER send the secret digit value!
+      sequenceSlots: (st.sequenceSlots || []).map((slot) => ({
+        slot: slot.slot,
+        glyph: slot.glyph
+      })),
+      // For Station 3, send material id, name, icon (strip isConductor boolean if desired, or verify via /api/verify)
+      circuitMaterials: st.circuitMaterials
+        ? st.circuitMaterials.map((m) => ({
+            id: m.id,
+            name: m.name,
+            icon: m.icon
+          }))
+        : undefined
+    };
+  });
+
+  return {
+    stations: publicStations
   };
 }
 
@@ -330,23 +372,35 @@ async function requestHandler(req, res) {
   try {
     const safeUrl = (req.url || '/').split('?')[0];
 
+    // 1. PUBLIC PLAYER CONFIG (No secrets/codes exposed)
     if (safeUrl === '/api/config' && req.method === 'GET') {
       const data = loadBackendData();
-      return sendJson(res, 200, buildComputedState(data));
+      return sendJson(res, 200, buildPublicPlayerState(data));
     }
 
-    if (safeUrl === '/api/config' && req.method === 'POST') {
+    // 2. PROTECTED OPERATOR BACKEND LOGIN & DATA FETCH
+    if (safeUrl === '/api/admin' && req.method === 'POST') {
       const body = await readJsonBody(req);
+      if (!isAuthorizedPasscode(body.passcode)) {
+        return sendJson(res, 401, { error: 'ACCESS DENIED: INVALID OPERATOR PASSCODE' });
+      }
+
       const current = loadBackendData();
 
+      // If only authenticating / fetching admin data
+      if (body.action === 'fetch') {
+        return sendJson(res, 200, buildFullAdminState(current));
+      }
+
+      // If resetting defaults
       if (body.resetDefaults) {
         const fresh = JSON.parse(JSON.stringify(DEFAULT_BACKEND_DATA));
         saveBackendData(fresh);
-        return sendJson(res, 200, buildComputedState(fresh));
+        return sendJson(res, 200, buildFullAdminState(fresh));
       }
 
+      // If updating a station's configuration
       const stId = parseInt(body.stationId, 10) || 1;
-
       if (stId === 1 && body.symbolValues && typeof body.symbolValues === 'object') {
         Object.keys(body.symbolValues).forEach((key) => {
           if (current.station1Symbols[key]) {
@@ -368,9 +422,6 @@ async function requestHandler(req, res) {
         if (st.type === 'code-lock' && typeof body.code === 'string' && body.code.trim()) {
           st.code = body.code.trim().replace(/\s+/g, '').slice(0, 8);
         }
-        if (st.type === 'circuit-lab' && Array.isArray(body.circuitMaterials)) {
-          st.circuitMaterials = body.circuitMaterials;
-        }
         if (st.type === 'code-lock' && typeof body.clueFormula === 'string' && body.clueFormula.trim()) {
           st.clues = [
             {
@@ -383,22 +434,36 @@ async function requestHandler(req, res) {
       }
 
       saveBackendData(current);
-      return sendJson(res, 200, buildComputedState(current));
+      return sendJson(res, 200, buildFullAdminState(current));
     }
 
+    // 3. PLAYER SOLUTION VERIFICATION ENDPOINT
     if (safeUrl === '/api/verify' && req.method === 'POST') {
       const body = await readJsonBody(req);
       const stId = parseInt(body.stationId, 10) || 1;
       const current = loadBackendData();
-      const computed = buildComputedState(current);
+      const computed = buildFullAdminState(current);
       const targetStation = computed.stations[stId] || computed.stations[1];
 
       current.stations[stId].stats = current.stations[stId].stats || { attempts: 0, solves: 0 };
       current.stations[stId].stats.attempts += 1;
 
       let success = false;
+      let materialResult = null;
+
       if (targetStation.type === 'circuit-lab') {
-        success = !!body.circuitComplete;
+        const mats = targetStation.circuitMaterials || [];
+        const chosen = mats.find((m) => m.id === body.materialId);
+        if (chosen) {
+          success = !!chosen.isConductor;
+          materialResult = {
+            id: chosen.id,
+            name: chosen.name,
+            isConductor: !!chosen.isConductor,
+            resistance: chosen.resistance,
+            reason: chosen.reason
+          };
+        }
       } else {
         const enteredCode = Array.isArray(body.slots)
           ? body.slots.join('')
@@ -414,9 +479,10 @@ async function requestHandler(req, res) {
       return sendJson(res, 200, {
         success,
         stationId: stId,
+        materialResult,
         victoryTitle: targetStation.victoryTitle,
         victorySubtitle: targetStation.victorySubtitle,
-        stats: current.stations[stId].stats
+        verifiedSlots: success ? targetStation.sequenceSlots : undefined
       });
     }
 
@@ -439,6 +505,6 @@ if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   const server = http.createServer(requestHandler);
   server.listen(PORT, () => {
-    console.log(`G11 SCB Bunker Control Panel & Multi-Station Backend running at http://localhost:${PORT}`);
+    console.log(`G11 SCB Bunker Control Panel & Protected Backend running at http://localhost:${PORT}`);
   });
 }
