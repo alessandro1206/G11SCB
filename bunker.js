@@ -137,6 +137,7 @@ let operatorPasscodeSession = null;
 let state = {
   onLandingPage: true, // Start on the Landing Page first!
   stationId: 1,
+  solvedStations: {},
   slots: ['', '', '', '', '', ''],
   activeSlot: 0,
   unlocked: false,
@@ -201,6 +202,19 @@ function updateLandingPageLabels() {
   const descEl = document.getElementById('landingStationDesc');
   if (assignEl) assignEl.textContent = `STATION 0${stId}`;
   if (descEl) descEl.textContent = `Assigned Terminal: ${stCfg.title}`;
+
+  [1, 2, 3, 4, 5].forEach((id) => {
+    const isSolved = !!(state.solvedStations && state.solvedStations[id]);
+    const boxEl = document.querySelector(`.challenge-box[data-launch-station="${id}"]`);
+    const statusEl = document.getElementById(`cbox-status-${id}`);
+    if (boxEl) {
+      boxEl.classList.toggle('solved-box', isSolved);
+    }
+    if (statusEl && isSolved) {
+      statusEl.className = 'cbox-status solved';
+      statusEl.innerHTML = '<i class="jewel-led green"></i> UNSEALED';
+    }
+  });
 }
 
 function assignDeviceToStation(stationNum) {
@@ -772,7 +786,9 @@ async function testCircuitBreaker() {
         updateGreenVerifiedBadges(result.verifiedSlots);
 
         setTimeout(() => {
+          state.solvedStations[3] = true;
           state.unlocked = true;
+          updateLandingPageLabels();
           renderConsole();
         }, 1600);
       } else {
@@ -1090,7 +1106,9 @@ async function verifyOverrideSequence() {
 
   if (isCorrect) {
     playAirlockUnlockSound();
+    state.solvedStations[state.stationId] = true;
     state.unlocked = true;
+    updateLandingPageLabels();
     appendCrtLog('AUTH', `SEQUENCE VERIFIED. ACCESS GRANTED!`, true);
     renderConsole();
   } else {

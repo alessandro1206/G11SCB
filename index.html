@@ -10,142 +10,223 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <!-- Ambient Vignette & Subtle Scanline Overlay -->
+  <!-- Ambient Vignette, Metallic Noise & Subtle Scanline Overlay -->
   <div class="ambient-vignette" aria-hidden="true"></div>
   <div class="crt-scanlines" aria-hidden="true"></div>
 
   <!-- ======================================================================= -->
-  <!-- 1. FIRST SCREEN: G11-SCB BUNKER LANDING PAGE WITH 5 CHALLENGE BOXES     -->
+  <!-- 1. FIRST SCREEN: G11-SCB BUNKER LANDING PAGE WITH 5 CHALLENGE RACKS     -->
   <!-- ======================================================================= -->
   <section class="bunker-landing-screen" id="bunkerLandingPage">
+    <div class="hex-bolt bolt-tl" aria-hidden="true"></div>
+    <div class="hex-bolt bolt-tr" aria-hidden="true"></div>
+    <div class="hex-bolt bolt-bl" aria-hidden="true"></div>
+    <div class="hex-bolt bolt-br" aria-hidden="true"></div>
+
     <div class="hazard-strip"></div>
 
     <div class="landing-chassis">
+      <!-- Top Industrial Header Rack -->
       <div class="landing-top-bar">
         <div class="landing-brand-row">
-          <span class="vault-mini-icon">☢️</span>
+          <div class="vault-mini-icon">
+            <span>☢️</span>
+          </div>
           <div>
-            <span class="landing-classification">CLASSIFIED // FACILITY G11-SCB // DEPTH: -140M</span>
-            <h1 class="landing-header-title">SECTOR G11-SCB // <span>BUNKER ESCAPE ROOM CONTROL HUB</span></h1>
+            <div class="stencil-sub-row">
+              <span class="landing-classification">MIL-SPEC // FACILITY G11-SCB // DEPTH: -140M</span>
+              <span class="vent-louvers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+            <h1 class="landing-header-title">SECTOR G11-SCB // <span>BUNKER CONTROL CONSOLE</span></h1>
           </div>
         </div>
-        <span class="landing-alert-pill">● 05 SECURITY SECTORS ACTIVE</span>
+
+        <div class="landing-status-cluster">
+          <div class="mini-gauge">
+            <span class="mg-label">GRID BUS</span>
+            <span class="mg-val">400V AC</span>
+          </div>
+          <div class="mini-gauge">
+            <span class="mg-label">OXYGEN</span>
+            <span class="mg-val">20.9%</span>
+          </div>
+          <span class="landing-alert-pill">● 05 SECTORS SEALED</span>
+        </div>
       </div>
 
-      <p class="landing-intro-text">
-        Select your station's challenge module below to initialize that device's bunker terminal. Complete each challenge until the screen turns full green (<strong>ACCESS GRANTED</strong>).
-      </p>
+      <div class="landing-instruction-strip">
+        <span class="strip-beacon"></span>
+        <p>
+          <strong>OPERATOR DIRECTIVE:</strong> Select the physical station module assigned to this terminal below. Solve the sector override challenge until the blast door unseals (<strong class="text-emerald">FULL GREEN ACCESS GRANTED</strong>).
+        </p>
+      </div>
 
-      <!-- 5 BOXES FOR EACH OF THE 5 GAMES -->
+      <!-- 5 HARDWARE RACK BOXES FOR EACH OF THE 5 GAMES -->
       <div class="landing-five-boxes-grid" id="landingBoxesGrid">
 
         <!-- BOX 1: CHALLENGE 01 -->
         <article class="challenge-box ready-box" data-launch-station="1">
+          <div class="rack-screws-top"><span></span><span>MOD-01 // ALPHA</span><span></span></div>
           <div class="cbox-top">
-            <span class="cbox-num">CHALLENGE 01 // SECTOR ALPHA</span>
-            <span class="cbox-status" id="cbox-status-1">🔒 ACTIVE</span>
+            <span class="cbox-num">STATION 01 // AIRLOCK ALPHA</span>
+            <span class="cbox-status" id="cbox-status-1"><i class="jewel-led amber"></i> LOCKED</span>
           </div>
-          <div class="cbox-icon-row">
-            <span class="cbox-main-icon">☢️</span>
-            <div class="cbox-mini-glyphs">☢️ ⚙️ 🔺 ☣️ ❄️ ☢️</div>
+
+          <!-- Recessed Glass Telemetry Preview -->
+          <div class="cbox-vfd-screen">
+            <div class="vfd-glare"></div>
+            <div class="cbox-vfd-top">
+              <span>CIPHER MATRIX</span>
+              <span>6-CH</span>
+            </div>
+            <div class="cbox-icon-row">
+              <span class="cbox-main-icon">☢️</span>
+              <div class="cbox-mini-glyphs">☢️ ⚙️ 🔺 ☣️ ❄️ ☢️</div>
+            </div>
           </div>
+
           <h2 class="cbox-title" id="cbox-title-1">SYMBOL SEQUENCE BLAST DOOR</h2>
           <p class="cbox-desc">
-            Find the 6 symbol equations scattered in the room, solve the numerical value of each symbol, and input the 6-digit door sequence.
+            Locate the 6 symbol equations hidden around the room, deduce the numerical value of each hazard symbol, and input the 6-digit door override sequence.
           </p>
           <button class="cbox-launch-btn" data-launch-station="1" type="button">
-            <span>LAUNCH CHALLENGE 01</span>
-            <span>→</span>
+            <span class="btn-led"></span>
+            <span>INITIALIZE STATION 01</span>
+            <span class="btn-arrow">→</span>
           </button>
         </article>
 
         <!-- BOX 2: CHALLENGE 02 -->
         <article class="challenge-box" data-launch-station="2">
+          <div class="rack-screws-top"><span></span><span>MOD-02 // BETA</span><span></span></div>
           <div class="cbox-top">
-            <span class="cbox-num">CHALLENGE 02 // SECTOR BETA</span>
-            <span class="cbox-status" id="cbox-status-2">🔒 ACTIVE</span>
+            <span class="cbox-num">STATION 02 // SECTOR BETA</span>
+            <span class="cbox-status" id="cbox-status-2"><i class="jewel-led amber"></i> LOCKED</span>
           </div>
-          <div class="cbox-icon-row">
-            <span class="cbox-main-icon">⚡</span>
-            <div class="cbox-mini-glyphs">REACTOR CORE</div>
+
+          <div class="cbox-vfd-screen">
+            <div class="vfd-glare"></div>
+            <div class="cbox-vfd-top">
+              <span>CORE TELEMETRY</span>
+              <span>TEMP: HIGH</span>
+            </div>
+            <div class="cbox-icon-row">
+              <span class="cbox-main-icon">⚡</span>
+              <div class="cbox-mini-glyphs">⚡ 🌡️ 🔋 ⚡</div>
+            </div>
           </div>
+
           <h2 class="cbox-title" id="cbox-title-2">REACTOR CORE OVERRIDE</h2>
           <p class="cbox-desc">
-            Locate the Sector Beta stabilization clues and enter the reactor override passcode on the tactical keypad terminal.
+            Locate the Sector Beta reactor stabilization clues and input the emergency cooling override code on the tactical keypad terminal.
           </p>
           <button class="cbox-launch-btn" data-launch-station="2" type="button">
-            <span>LAUNCH CHALLENGE 02</span>
-            <span>→</span>
+            <span class="btn-led"></span>
+            <span>INITIALIZE STATION 02</span>
+            <span class="btn-arrow">→</span>
           </button>
         </article>
 
         <!-- BOX 3: CHALLENGE 03 -->
         <article class="challenge-box ready-box" data-launch-station="3">
+          <div class="rack-screws-top"><span></span><span>MOD-03 // GAMMA</span><span></span></div>
           <div class="cbox-top">
-            <span class="cbox-num">CHALLENGE 03 // SECTOR GAMMA</span>
-            <span class="cbox-status" id="cbox-status-3">🔒 ACTIVE</span>
+            <span class="cbox-num">STATION 03 // SECTOR GAMMA</span>
+            <span class="cbox-status" id="cbox-status-3"><i class="jewel-led amber"></i> LOCKED</span>
           </div>
-          <div class="cbox-icon-row">
-            <span class="cbox-main-icon">💡</span>
-            <div class="cbox-mini-glyphs">🔋 + ⚡ + 🪙 = 💡</div>
+
+          <div class="cbox-vfd-screen">
+            <div class="vfd-glare"></div>
+            <div class="cbox-vfd-top">
+              <span>CONTINUITY TESTBENCH</span>
+              <span>12.0V DC</span>
+            </div>
+            <div class="cbox-icon-row">
+              <span class="cbox-main-icon">💡</span>
+              <div class="cbox-mini-glyphs">🔋 ➔ 🪙 ➔ 💡</div>
+            </div>
           </div>
+
           <h2 class="cbox-title" id="cbox-title-3">SIMPLE CIRCUIT &amp; CONDUCTOR LAB</h2>
           <p class="cbox-desc">
-            Complete the 4-item materials scavenger checklist, construct a simple circuit, and test materials to replace the broken wire and light up the bulb.
+            Complete the 4-item materials scavenger checklist, construct a simple circuit, and test materials to replace the severed wire and ignite the bulb.
           </p>
           <button class="cbox-launch-btn" data-launch-station="3" type="button">
-            <span>LAUNCH CHALLENGE 03</span>
-            <span>→</span>
+            <span class="btn-led"></span>
+            <span>INITIALIZE STATION 03</span>
+            <span class="btn-arrow">→</span>
           </button>
         </article>
 
         <!-- BOX 4: CHALLENGE 04 -->
         <article class="challenge-box" data-launch-station="4">
+          <div class="rack-screws-top"><span></span><span>MOD-04 // DELTA</span><span></span></div>
           <div class="cbox-top">
-            <span class="cbox-num">CHALLENGE 04 // SECTOR DELTA</span>
-            <span class="cbox-status" id="cbox-status-4">🔒 ACTIVE</span>
+            <span class="cbox-num">STATION 04 // SECTOR DELTA</span>
+            <span class="cbox-status" id="cbox-status-4"><i class="jewel-led amber"></i> LOCKED</span>
           </div>
-          <div class="cbox-icon-row">
-            <span class="cbox-main-icon">❄️</span>
-            <div class="cbox-mini-glyphs">CRYO CHAMBER</div>
+
+          <div class="cbox-vfd-screen">
+            <div class="vfd-glare"></div>
+            <div class="cbox-vfd-top">
+              <span>CRYO-CHAMBER</span>
+              <span>-196.0 °C</span>
+            </div>
+            <div class="cbox-icon-row">
+              <span class="cbox-main-icon">❄️</span>
+              <div class="cbox-mini-glyphs">❄️ 🧪 ☣️ ❄️</div>
+            </div>
           </div>
+
           <h2 class="cbox-title" id="cbox-title-4">CRYO-CONTAINMENT TERMINAL</h2>
           <p class="cbox-desc">
-            Inspect the Sector Delta containment logs and input the thermal stabilization override sequence to unseal the chamber.
+            Inspect the Sector Delta cryo-containment logs and input the thermal stabilization override sequence to unseal the vault.
           </p>
           <button class="cbox-launch-btn" data-launch-station="4" type="button">
-            <span>LAUNCH CHALLENGE 04</span>
-            <span>→</span>
+            <span class="btn-led"></span>
+            <span>INITIALIZE STATION 04</span>
+            <span class="btn-arrow">→</span>
           </button>
         </article>
 
         <!-- BOX 5: CHALLENGE 05 -->
         <article class="challenge-box" data-launch-station="5">
+          <div class="rack-screws-top"><span></span><span>MOD-05 // OMEGA</span><span></span></div>
           <div class="cbox-top">
-            <span class="cbox-num">CHALLENGE 05 // SECTOR OMEGA</span>
-            <span class="cbox-status" id="cbox-status-5">🔒 ACTIVE</span>
+            <span class="cbox-num">STATION 05 // SECTOR OMEGA</span>
+            <span class="cbox-status" id="cbox-status-5"><i class="jewel-led amber"></i> LOCKED</span>
           </div>
-          <div class="cbox-icon-row">
-            <span class="cbox-main-icon">🚨</span>
-            <div class="cbox-mini-glyphs">FINAL EXIT DOOR</div>
+
+          <div class="cbox-vfd-screen">
+            <div class="vfd-glare"></div>
+            <div class="cbox-vfd-top">
+              <span>SURFACE AIRLOCK</span>
+              <span>FINAL EXIT</span>
+            </div>
+            <div class="cbox-icon-row">
+              <span class="cbox-main-icon">🚨</span>
+              <div class="cbox-mini-glyphs">🚨 🔓 ☢️ 🚨</div>
+            </div>
           </div>
+
           <h2 class="cbox-title" id="cbox-title-5">MASTER EVACUATION BLAST DOOR</h2>
           <p class="cbox-desc">
-            Final bunker clearance station. Enter the master evacuation sequence to open the surface blast doors and escape!
+            Final bunker clearance station. Combine sector clearance data and enter the master evacuation code to open the surface blast doors!
           </p>
           <button class="cbox-launch-btn" data-launch-station="5" type="button">
-            <span>LAUNCH CHALLENGE 05</span>
-            <span>→</span>
+            <span class="btn-led"></span>
+            <span>INITIALIZE STATION 05</span>
+            <span class="btn-arrow">→</span>
           </button>
         </article>
 
       </div>
 
       <div class="landing-footer">
-        <span>G11-SCB UNDERGROUND CONTAINMENT DIVISION // SYS.v4.5</span>
+        <span>G11-SCB UNDERGROUND CONTAINMENT DIVISION // HARDWARE REV 4.8</span>
         <!-- Passcode-Protected Backend Trigger -->
         <button class="stealth-crew-lock" id="stealthCrewBtn" type="button" title="Restricted Crew Terminal">
-          🔒 CREW BACKEND (PASSCODE REQUIRED)
+          🔒 CREW BACKEND (AUTH REQUIRED)
         </button>
       </div>
     </div>
@@ -161,7 +242,7 @@
 
     <div class="green-takeover-content">
       <div class="green-emblem-ring">
-        <div class="green-emblem-inner">UNLOCKED</div>
+        <div class="green-emblem-inner">UNSEALED</div>
       </div>
 
       <div class="green-status-pill" id="greenStatusPill">AUTHORIZATION VERIFIED // OVERRIDE COMPLETE</div>
@@ -175,15 +256,15 @@
       </div>
 
       <div class="green-telemetry-strip">
-        <span>SEAL LOCKS: DISENGAGED</span>
+        <span>HYDRAULIC LOCKS: RETRACTED</span>
         <span>•</span>
-        <span>PRESSURE: EQUALIZED</span>
+        <span>AIRLOCK PRESSURE: EQUALIZED</span>
         <span>•</span>
-        <span>EXIT PATH: CLEAR</span>
+        <span>BULKHEAD: OPEN</span>
       </div>
 
       <button class="green-reset-btn" id="greenResetBtn" type="button">
-        🔑 RE-LOCK TERMINAL &amp; RETURN TO LANDING SCREEN (ESC)
+        🔑 RE-LOCK TERMINAL &amp; RETURN TO MAIN HUB (ESC)
       </button>
     </div>
 
@@ -191,7 +272,7 @@
   </section>
 
   <!-- ======================================================================= -->
-  <!-- 3. MAIN INDUSTRIAL HARDWARE CHASSIS (SINGLE ASSIGNED DEVICE CHALLENGE)  -->
+  <!-- 3. MAIN INDUSTRIAL HARDWARE CHASSIS (ACTIVE CHALLENGE CONSOLE)          -->
   <!-- ======================================================================= -->
   <div class="bunker-chassis hidden" id="mainChassis">
     <!-- 4 Machined Corner Hex Bolts -->
@@ -226,24 +307,24 @@
         <div class="telemetry-item">
           <span class="led-lamp led-amber"></span>
           <div class="tel-text">
-            <span class="tel-label">ACTIVE DEVICE</span>
+            <span class="tel-label">ACTIVE MODULE</span>
             <span class="tel-val" id="activeDeviceBadge">STATION 01</span>
           </div>
         </div>
         <div class="telemetry-item">
           <span class="led-lamp led-red" id="doorStatusLamp"></span>
           <div class="tel-text">
-            <span class="tel-label">AIRLOCK SEAL</span>
+            <span class="tel-label">BULKHEAD SEAL</span>
             <span class="tel-val" id="doorStatusText">LOCKED</span>
           </div>
         </div>
       </div>
 
-      <!-- Physical Panel Rocker Switches (NO PUBLIC BACKEND BUTTON) -->
+      <!-- Physical Panel Rocker Switches -->
       <div class="rocker-switches">
-        <button class="rocker-btn" id="backToLandingBtn" type="button" title="Return to Bunker Briefing Screen">
+        <button class="rocker-btn" id="backToLandingBtn" type="button" title="Return to 5-Challenge Control Hub">
           <span class="rocker-led"></span>
-          <span class="rocker-label">⌂ BRIEFING</span>
+          <span class="rocker-label">◀ ALL 5 STATIONS</span>
         </button>
         <button class="rocker-btn active" id="sfxSwitchBtn" type="button" title="Toggle Terminal Audio">
           <span class="rocker-led"></span>
@@ -359,7 +440,7 @@
         <div class="hardware-module circuit-telemetry-module hidden" id="circuitTelemetryModule">
           <div class="module-title-bar">
             <span class="module-code">MOD-03 // DIGITAL MULTIMETER &amp; OHMMETER</span>
-            <button class="recessed-mini-btn" id="resetCircuitBtn" type="button">↺ RESET CIRCUIT</button>
+            <button class="recessed-mini-btn" id="resetCircuitBtn" type="button">↺ RESET BENCH</button>
           </div>
 
           <div class="multimeter-grid">
@@ -382,10 +463,10 @@
           </div>
 
           <div class="circuit-steps-box">
-            <div class="cstep-title">CIRCUIT ASSEMBLY PROTOCOL:</div>
+            <div class="cstep-title">CIRCUIT CONSTRUCTION TELEMETRY:</div>
             <div class="cstep-item" id="cstep-battery">
               <span class="cstep-dot"></span>
-              <span>1. Install 12V DC Battery Power Source</span>
+              <span>1. Mount 12V DC Battery Power Source</span>
             </div>
             <div class="cstep-item" id="cstep-wire">
               <span class="cstep-dot"></span>
@@ -418,12 +499,13 @@
             <div class="housing-label" id="sequenceHousingLabel">REQUIRED DOOR UNLOCK SEQUENCE</div>
 
             <div class="sequence-cells-grid" id="sequenceGrid">
-              <!-- Populated dynamically -->
+              <!-- Populated dynamically with realistic 7-segment ghost backlights -->
             </div>
           </div>
 
           <!-- Vacuum Fluorescent Status Readout Strip -->
           <div class="vfd-display-well">
+            <div class="vfd-glare"></div>
             <div class="vfd-text" id="vfdReadout">AWAITING OVERRIDE SEQUENCE...</div>
           </div>
 
@@ -431,56 +513,68 @@
           <div class="keypad-deck" id="keypadDeck">
             <div class="mechanical-keypad" id="mechKeypad">
               <button class="mech-key" data-key="1" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">1</span>
                 <span class="key-sub">ALPHA</span>
               </button>
               <button class="mech-key" data-key="2" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">2</span>
                 <span class="key-sub">BRAVO</span>
               </button>
               <button class="mech-key" data-key="3" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">3</span>
                 <span class="key-sub">CHARLIE</span>
               </button>
               <button class="mech-key" data-key="4" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">4</span>
                 <span class="key-sub">DELTA</span>
               </button>
               <button class="mech-key" data-key="5" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">5</span>
                 <span class="key-sub">ECHO</span>
               </button>
               <button class="mech-key" data-key="6" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">6</span>
                 <span class="key-sub">FOXTROT</span>
               </button>
               <button class="mech-key" data-key="7" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">7</span>
                 <span class="key-sub">GOLF</span>
               </button>
               <button class="mech-key" data-key="8" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">8</span>
                 <span class="key-sub">HOTEL</span>
               </button>
               <button class="mech-key" data-key="9" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">9</span>
                 <span class="key-sub">INDIA</span>
               </button>
               <button class="mech-key key-warn" data-key="CLR" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">CLR</span>
                 <span class="key-sub">PURGE</span>
               </button>
               <button class="mech-key" data-key="0" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">0</span>
                 <span class="key-sub">NULL</span>
               </button>
               <button class="mech-key key-caution" data-key="DEL" type="button">
+                <span class="key-led"></span>
                 <span class="key-num">⌫</span>
                 <span class="key-sub">BACK</span>
               </button>
             </div>
 
-            <!-- Heavy Industrial Actuator Button -->
+            <!-- Heavy Industrial Guarded Actuator Button -->
             <div class="actuator-housing">
               <button class="actuator-btn" id="engageOverrideBtn" type="button">
                 <span class="actuator-label">🔓 ENGAGE BLAST DOOR OVERRIDE</span>
@@ -500,8 +594,8 @@
           <div class="st3-phase1-container" id="st3Phase1Box">
             <div class="phase-banner">
               <span class="phase-step-pill">STEP 1 OF 2 // ROOM SCAVENGER CHECKLIST</span>
-              <h3>FIND THESE 4 CIRCUIT ITEMS IN THE BUNKER</h3>
-              <p>Search Station 03 for the required electrical components and test materials. Check off each item below once your team has found it to unlock the Circuit Construction Workbench:</p>
+              <h3>LOCATE THESE 4 CIRCUIT ITEMS IN THE BUNKER</h3>
+              <p>Search Station 03 for the required electrical components and test materials. Lock in each item below once your team has found it to unlock the Circuit Construction Workbench:</p>
             </div>
 
             <div class="scavenger-checklist-grid" id="scavengerChecklistGrid">
@@ -511,7 +605,7 @@
                 <div class="scav-details">
                   <span class="scav-tag">COMPONENT #01 // POWER SOURCE</span>
                   <h4>12V DC Power Cell (Battery)</h4>
-                  <p>Provides voltage to push electrons through the circuit loop.</p>
+                  <p>Provides electrical potential (voltage) to drive electrons around the circuit loop.</p>
                 </div>
                 <button class="scav-check-btn" data-scav-btn="0" type="button">
                   ⬜ MARK FOUND
@@ -524,7 +618,7 @@
                 <div class="scav-details">
                   <span class="scav-tag">COMPONENT #02 // CONDUCTIVE PATH</span>
                   <h4>Copper Wire Leads &amp; Alligator Clips</h4>
-                  <p>Connects the battery terminals to the bulb socket (one wire is severed!).</p>
+                  <p>Connects the battery terminals to the bulb socket (one return wire is severed!).</p>
                 </div>
                 <button class="scav-check-btn" data-scav-btn="1" type="button">
                   ⬜ MARK FOUND
@@ -537,7 +631,7 @@
                 <div class="scav-details">
                   <span class="scav-tag">COMPONENT #03 // ELECTRICAL LOAD</span>
                   <h4>Emergency Filament Light Bulb</h4>
-                  <p>Lights up the dark bunker corridor to reveal the hidden door when powered.</p>
+                  <p>Illuminates the dark bunker corridor to reveal the hidden door when current flows.</p>
                 </div>
                 <button class="scav-check-btn" data-scav-btn="2" type="button">
                   ⬜ MARK FOUND
@@ -639,6 +733,7 @@
 
             <!-- VFD Status Readout for Circuit Lab -->
             <div class="vfd-display-well">
+              <div class="vfd-glare"></div>
               <div class="vfd-text" id="circuitVfdReadout">
                 CLICK SLOTS 1, 2 &amp; 3 ON THE CIRCUIT BOARD TO CONSTRUCT THE CIRCUIT...
               </div>
@@ -725,7 +820,7 @@
       <div class="device-assign-bar">
         <div class="assign-label">
           <strong>🖥️ ASSIGN THIS DEVICE TO CHALLENGE:</strong>
-          <span>Players on this device will only see the selected station's hardware console</span>
+          <span>Select a station below to view its clues/materials or switch this device's active console</span>
         </div>
         <div class="device-station-pills" id="deviceStationSelector">
           <button class="st-pill active" data-st="1" type="button">STATION 01 (SYMBOLS)</button>
