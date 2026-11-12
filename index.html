@@ -14,8 +14,47 @@
   <div class="ambient-vignette" aria-hidden="true"></div>
   <div class="crt-scanlines" aria-hidden="true"></div>
 
-  <!-- Outer Brushed-Steel Industrial Hardware Chassis -->
-  <div class="bunker-chassis">
+  <!-- ======================================================================= -->
+  <!-- FULL-SCREEN GREEN "ACCESS GRANTED" TAKEOVER SCREEN (ON SOLVE)           -->
+  <!-- ======================================================================= -->
+  <section class="full-green-takeover hidden" id="fullGreenScreen" aria-live="assertive">
+    <div class="green-hazard-bar top"></div>
+
+    <div class="green-takeover-content">
+      <div class="green-emblem-ring">
+        <div class="green-emblem-inner">UNLOCKED</div>
+      </div>
+
+      <div class="green-status-pill">AUTHORIZATION VERIFIED // AIRLOCK ALPHA OVERRIDE</div>
+      <h1 class="green-giant-title" id="greenVictoryTitle">ACCESS GRANTED</h1>
+      <p class="green-subtitle" id="greenVictorySubtitle">
+        BLAST DOOR UNSEALED — PROCEED TO NEXT CHALLENGE STATION
+      </p>
+
+      <div class="green-sequence-verified" id="greenVerifiedRow">
+        <!-- Populated dynamically with the 6 verified symbols & digits -->
+      </div>
+
+      <div class="green-telemetry-strip">
+        <span>SEAL LOCKS: DISENGAGED</span>
+        <span>•</span>
+        <span>PRESSURE: EQUALIZED</span>
+        <span>•</span>
+        <span>EXIT PATH: CLEAR</span>
+      </div>
+
+      <button class="green-reset-btn" id="greenResetBtn" type="button">
+        🔑 RE-LOCK AIRLOCK &amp; RESET FOR NEXT TEAM (ESC)
+      </button>
+    </div>
+
+    <div class="green-hazard-bar bottom"></div>
+  </section>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN INDUSTRIAL HARDWARE CHASSIS                                        -->
+  <!-- ======================================================================= -->
+  <div class="bunker-chassis" id="mainChassis">
     <!-- 4 Machined Corner Hex Bolts -->
     <div class="hex-bolt bolt-tl" aria-hidden="true"></div>
     <div class="hex-bolt bolt-tr" aria-hidden="true"></div>
@@ -31,7 +70,7 @@
         <div class="rivet r-left"></div>
         <div class="nameplate-content">
           <span class="serial-code">UNIT: G11-SCB // SEC-01 // MK-IV</span>
-          <h1 class="hardware-title">BUNKER BLAST DOOR CONTROL PANEL</h1>
+          <h1 class="hardware-title" id="stationHeaderTitle">BUNKER BLAST DOOR CONTROL PANEL</h1>
         </div>
         <div class="rivet r-right"></div>
       </div>
@@ -71,6 +110,10 @@
           <span class="rocker-led"></span>
           <span class="rocker-label">FULLSCREEN</span>
         </button>
+        <button class="rocker-btn backend-btn" id="openBackendBtn" type="button" title="Open Backend Materials, Clues & Settings">
+          <span class="rocker-led backend-led"></span>
+          <span class="rocker-label">⚙️ BACKEND</span>
+        </button>
       </div>
     </header>
 
@@ -95,7 +138,7 @@
             <div class="waveform-box">
               <svg viewBox="0 0 320 48" class="waveform-svg" preserveAspectRatio="none">
                 <path class="grid-line" d="M0 12 H320 M0 24 H320 M0 36 H320 M64 0 V48 M128 0 V48 M192 0 V48 M256 0 V48" />
-                <path class="pulse-wave" id="waveformPath" d="M 0 24 L 40 24 L 52 8 L 64 40 L 76 14 L 88 32 L 100 24 L 160 24 L 172 6 L 184 42 L 196 18 L 208 24 L 320 24" />
+                <path class="pulse-wave" d="M 0 24 L 40 24 L 52 8 L 64 40 L 76 14 L 88 32 L 100 24 L 160 24 L 172 6 L 184 42 L 196 18 L 208 24 L 320 24" />
               </svg>
             </div>
 
@@ -109,7 +152,7 @@
         </div>
 
         <!-- Physical Field Decoder Scratchpad Module -->
-        <div class="hardware-module scratchpad-module">
+        <div class="hardware-module scratchpad-module" id="scratchpadModule">
           <div class="module-title-bar">
             <span class="module-code">MOD-02 // SYMBOL VALUE LOG</span>
             <button class="recessed-mini-btn" id="clearNotesBtn" type="button">RESET LOG</button>
@@ -190,74 +233,74 @@
             <div class="housing-label">REQUIRED DOOR UNLOCK SEQUENCE (6 DIGITS)</div>
 
             <div class="sequence-cells-grid" id="sequenceGrid">
-              <!-- Slot 1: ☢️ -->
+              <!-- Slot 1 -->
               <div class="seq-cell active" data-slot="0">
                 <div class="cell-header">
                   <span class="cell-pos">CH-01</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">☢️</span>
+                  <span class="hazard-glyph" id="slot-glyph-0">☢️</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-0">-</div>
               </div>
 
-              <!-- Slot 2: ⚙️ -->
+              <!-- Slot 2 -->
               <div class="seq-cell" data-slot="1">
                 <div class="cell-header">
                   <span class="cell-pos">CH-02</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">⚙️</span>
+                  <span class="hazard-glyph" id="slot-glyph-1">⚙️</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-1">-</div>
               </div>
 
-              <!-- Slot 3: 🔺 -->
+              <!-- Slot 3 -->
               <div class="seq-cell" data-slot="2">
                 <div class="cell-header">
                   <span class="cell-pos">CH-03</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">🔺</span>
+                  <span class="hazard-glyph" id="slot-glyph-2">🔺</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-2">-</div>
               </div>
 
-              <!-- Slot 4: ☣️ -->
+              <!-- Slot 4 -->
               <div class="seq-cell" data-slot="3">
                 <div class="cell-header">
                   <span class="cell-pos">CH-04</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">☣️</span>
+                  <span class="hazard-glyph" id="slot-glyph-3">☣️</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-3">-</div>
               </div>
 
-              <!-- Slot 5: ❄️ -->
+              <!-- Slot 5 -->
               <div class="seq-cell" data-slot="4">
                 <div class="cell-header">
                   <span class="cell-pos">CH-05</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">❄️</span>
+                  <span class="hazard-glyph" id="slot-glyph-4">❄️</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-4">-</div>
               </div>
 
-              <!-- Slot 6: ☢️ -->
+              <!-- Slot 6 -->
               <div class="seq-cell" data-slot="5">
                 <div class="cell-header">
                   <span class="cell-pos">CH-06</span>
                   <span class="cell-led"></span>
                 </div>
                 <div class="cell-symbol-window">
-                  <span class="hazard-glyph">☢️</span>
+                  <span class="hazard-glyph" id="slot-glyph-5">☢️</span>
                 </div>
                 <div class="cell-seven-seg" id="digit-slot-5">-</div>
               </div>
@@ -325,26 +368,7 @@
             <!-- Heavy Industrial Actuator Button -->
             <div class="actuator-housing">
               <button class="actuator-btn" id="engageOverrideBtn" type="button">
-                <span class="actuator-stripe"></span>
                 <span class="actuator-label">🔓 ENGAGE BLAST DOOR OVERRIDE</span>
-                <span class="actuator-stripe"></span>
-              </button>
-            </div>
-          </div>
-
-          <!-- UNLOCKED BLAST DOOR OVERLAY PANEL (Appears on solving 578565) -->
-          <div class="unlocked-chamber hidden" id="unlockedChamber">
-            <div class="airlock-door-visual">
-              <div class="door-ring">
-                <div class="door-core">OPEN</div>
-              </div>
-            </div>
-            <div class="unlocked-details">
-              <span class="access-tag">AUTHORIZATION CONFIRMED // CODE 5-7-8-5-6-5</span>
-              <h2>BLAST DOOR UNSEALED</h2>
-              <p>Airlock Alpha mechanical locks disengaged. Proceed immediately to the next challenge station in the bunker.</p>
-              <button class="relock-key-btn" id="relockSystemBtn" type="button">
-                🔑 RE-LOCK AIRLOCK (RESET FOR NEXT TEAM)
               </button>
             </div>
           </div>
@@ -360,6 +384,154 @@
       <span>KEYBOARD INPUT ACTIVE [0-9, BACKSPACE, ENTER, ESC]</span>
     </footer>
     <div class="hazard-strip"></div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- BACKEND CONTROL CENTER (CLUES, REQUIRED MATERIALS, & SETTINGS)          -->
+  <!-- ======================================================================= -->
+  <div class="backend-modal-backdrop hidden" id="backendModal">
+    <div class="backend-modal-window">
+      <div class="backend-modal-header">
+        <div>
+          <span class="backend-tag">G11-SCB // SERVER BACKEND PORTAL</span>
+          <h2>OPERATOR MATERIALS, CLUES &amp; SYSTEM SETTINGS</h2>
+        </div>
+        <button class="backend-close-btn" id="closeBackendBtn" type="button">✕ CLOSE</button>
+      </div>
+
+      <!-- Backend Navigation Tabs -->
+      <div class="backend-tabs">
+        <button class="btab-btn active" data-btab="tab-clues" type="button">
+          🖨️ 1. SCATTERED CLUES (PRINTABLE)
+        </button>
+        <button class="btab-btn" data-btab="tab-materials" type="button">
+          📦 2. REQUIRED MATERIALS &amp; ANSWER KEY
+        </button>
+        <button class="btab-btn" data-btab="tab-settings" type="button">
+          🎛️ 3. GAME SETTINGS &amp; CONTROLS
+        </button>
+      </div>
+
+      <div class="backend-modal-body">
+
+        <!-- TAB 1: PRINTABLE EQUATION CLUES -->
+        <div class="btab-panel active" id="tab-clues">
+          <div class="btab-top-bar">
+            <p>
+              These <strong>6 Equation Cards</strong> are generated by the backend. Print them out, cut along the dashed lines, and hide them around the physical room.
+            </p>
+            <button class="backend-action-btn primary" onclick="window.print()" type="button">
+              🖨️ PRINT 6 CLUE CARDS
+            </button>
+          </div>
+
+          <div class="printable-clues-grid" id="backendCluesGrid">
+            <!-- Populated dynamically from /api/config -->
+          </div>
+        </div>
+
+        <!-- TAB 2: REQUIRED MATERIALS & MASTER ANSWER KEY -->
+        <div class="btab-panel" id="tab-materials">
+          <div class="answer-key-banner">
+            <div class="ak-block">
+              <span class="ak-label">MASTER UNLOCK CODE</span>
+              <strong class="ak-code" id="backendMasterCode">578565</strong>
+            </div>
+            <div class="ak-block">
+              <span class="ak-label">SYMBOL VALUES</span>
+              <div class="ak-symbols" id="backendSymbolSummary">
+                ☢️=5 | ⚙️=7 | 🔺=8 | ☣️=5 | ❄️=6
+              </div>
+            </div>
+            <div class="ak-block">
+              <span class="ak-label">SESSION STATS</span>
+              <div class="ak-stats" id="backendStatsSummary">
+                Attempts: 0 | Solves: 0
+              </div>
+            </div>
+          </div>
+
+          <h3 class="backend-sec-title">REQUIRED ROOM MATERIALS &amp; SETUP CHECKLIST</h3>
+          <div class="materials-list" id="backendMaterialsList">
+            <!-- Populated dynamically from /api/config -->
+          </div>
+        </div>
+
+        <!-- TAB 3: BACKEND SETTINGS & LIVE CONTROLS -->
+        <div class="btab-panel" id="tab-settings">
+          <div class="settings-grid">
+            <!-- Symbol Values Editor -->
+            <div class="settings-card">
+              <h3>1. SYMBOL NUMERICAL VALUES (0–9)</h3>
+              <p class="settings-hint">Changing these values automatically updates all 6 equations and the 6-digit door unlock code on the backend:</p>
+              <div class="sym-config-list" id="symConfigInputs">
+                <label class="sym-cfg-row">
+                  <span>☢️ RADIATION</span>
+                  <input type="number" min="0" max="9" id="cfg-sym-radiation" value="5" />
+                </label>
+                <label class="sym-cfg-row">
+                  <span>⚙️ MECHANICAL GEAR</span>
+                  <input type="number" min="0" max="9" id="cfg-sym-gear" value="7" />
+                </label>
+                <label class="sym-cfg-row">
+                  <span>🔺 DELTA HAZARD</span>
+                  <input type="number" min="0" max="9" id="cfg-sym-triangle" value="8" />
+                </label>
+                <label class="sym-cfg-row">
+                  <span>☣️ BIOHAZARD</span>
+                  <input type="number" min="0" max="9" id="cfg-sym-biohazard" value="5" />
+                </label>
+                <label class="sym-cfg-row">
+                  <span>❄️ CRYO-FROST</span>
+                  <input type="number" min="0" max="9" id="cfg-sym-snowflake" value="6" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Display & Victory Screen Settings -->
+            <div class="settings-card">
+              <h3>2. TERMINAL &amp; GREEN SCREEN SETTINGS</h3>
+              <div class="form-stack">
+                <label>
+                  <span>Full-Screen Green Banner Title</span>
+                  <input type="text" id="cfgVictoryTitle" value="ACCESS GRANTED" />
+                </label>
+                <label>
+                  <span>Full-Screen Green Directive Subtitle</span>
+                  <input type="text" id="cfgVictorySubtitle" value="BLAST DOOR UNSEALED — PROCEED TO NEXT CHALLENGE STATION" />
+                </label>
+                <label class="checkbox-row">
+                  <input type="checkbox" id="cfgShowScratchpad" checked />
+                  <span>Show Optional Symbol Value Scratchpad on Left Bay</span>
+                </label>
+              </div>
+
+              <div class="settings-actions">
+                <button class="backend-action-btn primary" id="saveBackendConfigBtn" type="button">
+                  💾 SAVE SETTINGS TO BACKEND
+                </button>
+                <button class="backend-action-btn secondary" id="resetDefaultConfigBtn" type="button">
+                  ↺ RESTORE DEFAULT (578565)
+                </button>
+              </div>
+              <div class="save-feedback" id="backendSaveFeedback"></div>
+
+              <hr class="settings-divider" />
+              <h3>3. OPERATOR LIVE OVERRIDES</h3>
+              <div class="operator-quick-btns">
+                <button class="backend-action-btn emerald" id="triggerGreenScreenBtn" type="button">
+                  ✅ FORCE UNLOCK (TEST FULL GREEN SCREEN)
+                </button>
+                <button class="backend-action-btn danger" id="forceRelockBtn" type="button">
+                  🔒 FORCE RE-LOCK TERMINAL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <script src="/bunker.js"></script>
